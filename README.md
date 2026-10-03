@@ -4,6 +4,10 @@ Big-number math practice for Class 1: addition, subtraction, multiplication and 
 
 - Easy / Medium / Hard / Custom difficulty
 - Up-and-down (column) or side-by-side question layout
+- Worlds: 👑 Princess castle, 🚀 Space adventure (astronauts and robots) or ✏️ Classic.
+  An animated friend walks to the castle or planet as questions are answered, cheers
+  during the test and celebrates on the results screen. Stars earned unlock more friends
+  (at 5, 15, 30 and 50 stars).
 - Start, Pause and Finish timer (stopwatch or 2/5/10 minute countdown)
 - Automatic results with stars, time taken and answer review
 - Progress page: every finished test is saved in the browser, with a score chart,
