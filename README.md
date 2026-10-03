@@ -3,6 +3,7 @@
 Big-number math practice for Class 1: addition, subtraction, multiplication and division.
 
 - Easy / Medium / Hard / Custom difficulty
+- Up-and-down (column) or side-by-side question layout
 - Start, Pause and Finish timer (stopwatch or 2/5/10 minute countdown)
 - Automatic results with stars, time taken and answer review
 - Progress page: every finished test is saved in the browser, with a score chart,

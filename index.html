@@ -194,6 +194,24 @@
   .expr input::-webkit-outer-spin-button, .expr input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .expr input:not(:placeholder-shown) { border-style: solid; }
 
+  /* Up-and-down (column) layout */
+  .sheet.vertical { grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr)); }
+  .vexpr {
+    display: grid; grid-template-columns: auto calc(var(--w) + .24em + 6px); column-gap: .3em;
+    justify-content: center; align-items: center; padding-block: 4px 2px;
+    font-family: var(--display); font-weight: 600; font-size: clamp(2rem, 24cqi, 3.8rem); line-height: 1.1;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .vexpr .vnum { text-align: right; padding-right: calc(.12em + 3px); }
+  .vexpr .op { color: var(--c); text-align: center; }
+  .vexpr .vline { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: var(--ink); margin: .1em 0 .18em; }
+  .vexpr input {
+    grid-column: 2; box-sizing: border-box; width: 100%;
+    font: inherit; text-align: right; color: var(--ink);
+    background: var(--t); border: 3px dashed var(--c); border-radius: 14px; padding: 0 .12em;
+  }
+  .vexpr input:not(:placeholder-shown) { border-style: solid; }
+
   /* Results */
   .results { display: grid; gap: 20px; }
   .hero-result { text-align: center; display: grid; gap: 6px; justify-items: center; padding: 28px 20px; }
@@ -251,7 +269,8 @@
     .sheet.locked { filter: none; }
     .sheet { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .card { box-shadow: none; border: 2px solid #ccc; break-inside: avoid; }
-    .expr input { background: #fff; border: 2px solid #999; color: transparent; }
+    .expr input, .vexpr input { background: #fff; border: 2px solid #999; color: transparent; }
+    .sheet.vertical { grid-template-columns: repeat(4, 1fr); }
     .print-name { display: block !important; }
   }
   /* Progress */
@@ -374,6 +393,13 @@
           <button type="button" class="chip" data-timer="10" aria-pressed="false">10 min</button>
         </div>
       </div>
+      <div class="group">
+        <span class="label">Layout</span>
+        <div class="chips" id="layoutChips">
+          <button type="button" class="chip" data-layout="vertical" aria-pressed="true">↕ Up and down</button>
+          <button type="button" class="chip" data-layout="horizontal" aria-pressed="false">↔ Side by side</button>
+        </div>
+      </div>
     </div>
 
     <div class="custom" id="customBox" hidden>
@@ -483,7 +509,7 @@
     hard:   { sumMax: 100, tableMax: 10, multMax: 10, hint: "Hard: + and − up to 100, tables 1 to 10." },
   };
 
-  const settings = { ops: ["add", "sub", "mul", "div"], level: "easy", count: 10, minutes: 0, name: "Mahreen",
+  const settings = { ops: ["add", "sub", "mul", "div"], level: "easy", count: 10, minutes: 0, layout: "vertical", name: "Mahreen",
                      custom: { sumMax: 30, tableMax: 5, multMax: 10 }, sound: true };
   try {
     const saved = JSON.parse(localStorage.getItem("mathSheetSettings") || "null");
@@ -534,10 +560,26 @@
 
   function renderSheet() {
     sheetEl.innerHTML = "";
+    sheetEl.classList.toggle("vertical", settings.layout === "vertical");
     problems.forEach((p, i) => {
       const card = document.createElement("div");
       card.className = "card"; card.dataset.op = p.op;
       const wide = String(p.ans).length > 2 ? " wide" : "";
+      const label = `Answer for ${p.a} ${NAME[p.op]} ${p.b}`;
+      if (settings.layout === "vertical") {
+        const w = Math.max(String(p.a).length, String(p.b).length, String(p.ans).length, 2);
+        card.innerHTML =
+          `<div class="qn"><span>Q${i + 1}</span><em>${NAME[p.op]}</em></div>
+           <div class="vexpr" style="--w:${w}ch">
+             <span></span><span class="vnum">${p.a}</span>
+             <span class="op">${SYM[p.op]}</span><span class="vnum">${p.b}</span>
+             <span class="vline" aria-hidden="true"></span>
+             <input id="ans${i}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4"
+                    placeholder=" " autocomplete="off" aria-label="${label}" disabled>
+           </div>`;
+        sheetEl.appendChild(card);
+        return;
+      }
       card.innerHTML =
         `<div class="qn"><span>Q${i + 1}</span><em>${NAME[p.op]}</em></div>
          <div class="expr"><span>${p.a}</span><span class="op">${SYM[p.op]}</span><span>${p.b}</span><span>=</span>
@@ -733,6 +775,7 @@
     document.querySelectorAll("#opChips .chip").forEach((b) => b.setAttribute("aria-pressed", settings.ops.includes(b.dataset.op)));
     document.querySelectorAll("#levelChips .chip").forEach((b) => b.setAttribute("aria-pressed", b.dataset.level === settings.level));
     document.querySelectorAll("#countChips .chip").forEach((b) => b.setAttribute("aria-pressed", +b.dataset.count === settings.count));
+    document.querySelectorAll("#layoutChips .chip").forEach((b) => b.setAttribute("aria-pressed", b.dataset.layout === settings.layout));
     document.querySelectorAll("#timerChips .chip").forEach((b) => b.setAttribute("aria-pressed", +b.dataset.timer === settings.minutes));
     $("customBox").hidden = settings.level !== "custom";
     const c = settings.custom;
@@ -752,6 +795,10 @@
   });
   $("levelChips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (b) { settings.level = b.dataset.level; changed(); } });
   $("countChips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (b) { settings.count = +b.dataset.count; changed(); } });
+  $("layoutChips").addEventListener("click", (e) => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    settings.layout = b.dataset.layout; syncChips(); save(); resetToReady(false);
+  });
   $("timerChips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (b) { settings.minutes = +b.dataset.timer; syncChips(); save(); drawClock(); } });
 
   const clampNum = (v, lo, hi, d) => { v = parseInt(v, 10); return isNaN(v) ? d : Math.min(hi, Math.max(lo, v)); };
