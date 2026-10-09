@@ -1,6 +1,8 @@
 # Mahreen's Math Sheet
 
 Big-number math practice for Class 1: addition, subtraction, multiplication and division.
+Also a Class 1 English test: letters, spelling, words and sentences, with pictures and
+tap-to-choose answers (Easy, Medium, Hard, and Harder for Class 2).
 
 - Easy / Medium / Hard / Harder (Class 2: 3-digit carrying and borrowing, tables to ×12) / Custom difficulty
 - Up-and-down (column) or side-by-side question layout

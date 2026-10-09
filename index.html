@@ -102,10 +102,14 @@
     width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
     font-family: var(--display); font-size: 1.5rem; font-weight: 700; color: #fff; line-height: 1;
   }
-  .op-chip[data-op="add"] .sym { background: var(--add); }
-  .op-chip[data-op="sub"] .sym { background: var(--sub); }
-  .op-chip[data-op="mul"] .sym { background: var(--mul); }
-  .op-chip[data-op="div"] .sym { background: var(--div); }
+  .op-chip[data-op="add"] .sym ,
+  .op-chip[data-op="abc"] .sym { background: var(--add); }
+  .op-chip[data-op="sub"] .sym ,
+  .op-chip[data-op="spell"] .sym { background: var(--sub); }
+  .op-chip[data-op="mul"] .sym ,
+  .op-chip[data-op="vocab"] .sym { background: var(--mul); }
+  .op-chip[data-op="div"] .sym ,
+  .op-chip[data-op="grammar"] .sym { background: var(--div); }
   .op-chip[aria-pressed="false"] { opacity: .55; }
   .op-chip[aria-pressed="true"]::after { content: "✓"; font-weight: 800; color: var(--good); }
   .op-chip[aria-pressed="false"] .sym { filter: grayscale(.6); }
@@ -171,10 +175,14 @@
     border: 3px solid transparent;
   }
   .card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 7px; background: var(--c); }
-  .card[data-op="add"] { --c: var(--add); --t: var(--add-tint); }
-  .card[data-op="sub"] { --c: var(--sub); --t: var(--sub-tint); }
-  .card[data-op="mul"] { --c: var(--mul); --t: var(--mul-tint); }
-  .card[data-op="div"] { --c: var(--div); --t: var(--div-tint); }
+  .card[data-op="add"] ,
+  .card[data-op="abc"] { --c: var(--add); --t: var(--add-tint); }
+  .card[data-op="sub"] ,
+  .card[data-op="spell"] { --c: var(--sub); --t: var(--sub-tint); }
+  .card[data-op="mul"] ,
+  .card[data-op="vocab"] { --c: var(--mul); --t: var(--mul-tint); }
+  .card[data-op="div"] ,
+  .card[data-op="grammar"] { --c: var(--div); --t: var(--div-tint); }
   .card .qn { font-weight: 800; font-size: .85rem; color: var(--ink-soft); display: flex; justify-content: space-between; }
   .card .qn em { font-style: normal; color: var(--c); }
   /* The card is a size container so the problem text scales to fit its own width. */
@@ -231,8 +239,10 @@
   .stat span { font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
   .op-breakdown { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
   .op-pill { border-radius: 99px; padding: 4px 14px; font-weight: 800; background: var(--t); color: var(--ink); }
-  .op-pill[data-op="add"] { --t: var(--add-tint); } .op-pill[data-op="sub"] { --t: var(--sub-tint); }
-  .op-pill[data-op="mul"] { --t: var(--mul-tint); } .op-pill[data-op="div"] { --t: var(--div-tint); }
+  .op-pill[data-op="add"] ,
+  .op-pill[data-op="abc"] { --t: var(--add-tint); } .op-pill[data-op="sub"] , .op-pill[data-op="spell"] { --t: var(--sub-tint); }
+  .op-pill[data-op="mul"] ,
+  .op-pill[data-op="vocab"] { --t: var(--mul-tint); } .op-pill[data-op="div"] , .op-pill[data-op="grammar"] { --t: var(--div-tint); }
 
   .review { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
   .rv {
@@ -317,8 +327,10 @@
   .pct-pill.lo { background: var(--bad-tint); color: var(--bad); }
   .op-dots { display: inline-flex; gap: 4px; }
   .op-dots i { width: 22px; height: 22px; border-radius: 7px; display: inline-grid; place-items: center; font-style: normal; color: #fff; font: 700 14px var(--display); }
-  .op-dots i[data-op="add"] { background: var(--add); } .op-dots i[data-op="sub"] { background: var(--sub); }
-  .op-dots i[data-op="mul"] { background: var(--mul); } .op-dots i[data-op="div"] { background: var(--div); }
+  .op-dots i[data-op="add"] ,
+  .op-dots i[data-op="abc"] { background: var(--add); } .op-dots i[data-op="sub"] , .op-dots i[data-op="spell"] { background: var(--sub); }
+  .op-dots i[data-op="mul"] ,
+  .op-dots i[data-op="vocab"] { background: var(--mul); } .op-dots i[data-op="div"] , .op-dots i[data-op="grammar"] { background: var(--div); }
   .detail td { background: var(--bg); }
   .detail .review { padding: 6px 0; }
   .icon-btn { font: inherit; font-weight: 800; background: none; border: 0; color: var(--ink-soft); cursor: pointer; padding: 4px 8px; border-radius: 8px; }
@@ -521,6 +533,32 @@
   @media print { #worldBg, .journey { display: none !important; } }
 
   .print-name { display: none; font-family: var(--display); font-size: 1.2rem; margin-bottom: 8px; }
+
+  /* English questions */
+  .sheet.eng { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); }
+  .eq { display: grid; justify-items: center; gap: 10px; text-align: center; padding-block: 4px; }
+  .eq .say { font-weight: 800; color: var(--ink-soft); font-size: .95rem; }
+  .eq .pic { font-size: 3.2rem; line-height: 1.1; }
+  .eq .prompt { font-family: var(--display); font-weight: 600; font-size: clamp(1.7rem, 11cqi, 2.4rem); line-height: 1.2; text-wrap: balance; }
+  .eq .prompt:empty { display: none; }
+  .eq .big-letter { font-size: 1.5em; }
+  .eq .word { color: var(--c); }
+  .eq .letter-boxes { letter-spacing: .1em; color: var(--ink-soft); }
+  .blank { display: inline-block; min-width: 1.1em; border-bottom: 4px solid var(--c); color: var(--c); }
+  .word-in {
+    font-family: var(--display); font-weight: 600; font-size: clamp(1.6rem, 10cqi, 2.2rem); text-align: center; color: var(--ink);
+    background: var(--t); border: 3px dashed var(--c); border-radius: 14px; padding: 2px 10px; max-width: 100%;
+  }
+  .word-in:not(:placeholder-shown) { border-style: solid; }
+  .choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .choice {
+    font-family: var(--display); font-weight: 600; font-size: 1.35rem; color: var(--ink);
+    background: var(--t); border: 3px solid transparent; border-radius: 14px; padding: 6px 16px; cursor: pointer; min-width: 64px;
+  }
+  .choice.emoji { font-size: 2rem; padding: 2px 12px; }
+  .choice[aria-pressed="true"] { border-color: var(--c); background: var(--paper); box-shadow: 0 3px 0 var(--c); }
+  .choice:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .subject-chip b { font-family: var(--display); }
 </style>
 </head>
 <body>
@@ -531,7 +569,7 @@
       <div class="badge" aria-hidden="true"><span>+</span><span>÷</span></div>
       <div>
         <h1 id="title">Mahreen's Math Sheet</h1>
-        <p class="sub-title">Class 1 practice · Add, take away, times and share</p>
+        <p class="sub-title" id="subTitle">Class 1 practice · Add, take away, times and share</p>
       </div>
     </div>
     <div class="pv-tools">
@@ -551,6 +589,14 @@
     <div class="settings-head">
       <h2 id="settingsTitle">Make a sheet</h2>
       <button class="btn small" id="newSheetBtn" type="button">✨ New questions</button>
+    </div>
+
+    <div class="group">
+      <span class="label">Subject</span>
+      <div class="chips" id="subjectChips">
+        <button type="button" class="chip subject-chip" data-subject="math" aria-pressed="true">📐 <b>Math</b></button>
+        <button type="button" class="chip subject-chip" data-subject="english" aria-pressed="false">🔤 <b>English</b></button>
+      </div>
     </div>
 
     <div class="group">
@@ -739,7 +785,7 @@
               hint: "Harder (Class 2): + and − with 3-digit numbers, always carrying or borrowing, tables 2 to 10 up to ×12." },
   };
 
-  const settings = { ops: ["add", "sub", "mul", "div"], level: "easy", count: 10, minutes: 0, layout: "vertical", world: "princess", buddy: { princess: 0, space: 0 }, name: "Mahreen",
+  const settings = { subject: "math", ops: ["add", "sub", "mul", "div"], engOps: ["abc", "spell", "vocab", "grammar"], level: "easy", count: 10, minutes: 0, layout: "vertical", world: "princess", buddy: { princess: 0, space: 0 }, name: "Mahreen",
                      custom: { sumMax: 30, tableMax: 5, multMax: 10 }, sound: true };
   try {
     const saved = JSON.parse(localStorage.getItem("mathSheetSettings") || "null");
@@ -747,6 +793,7 @@
   } catch (e) {}
   if (![10, 15, 20].includes(settings.count)) settings.count = 10;
   if (!LEVELS[settings.level] && settings.level !== "custom") settings.level = "easy";
+  if (!Array.isArray(settings.engOps) || !settings.engOps.length) settings.engOps = ["abc", "spell", "vocab", "grammar"];
   // Version 2: turn all four operations back on once, in case one was switched off by mistake.
   if (!(settings.v >= 2)) { settings.ops = ["add", "sub", "mul", "div"]; settings.v = 2; }
   const save = () => { try { localStorage.setItem("mathSheetSettings", JSON.stringify(settings)); } catch (e) {} };
@@ -784,14 +831,167 @@
     return { op, a, b, ans };
   }
 
+  // ---------- English (Class 1, with a Class 2 "Harder" level) ----------
+  // English topics reuse the four colour slots of the math operations.
+  const ENG_TOPICS = ["abc", "spell", "vocab", "grammar"];
+  const SLOT = { abc: "add", spell: "sub", vocab: "mul", grammar: "div" };
+  Object.assign(SYM, { abc: "Aa", spell: "✎", vocab: "🖼", grammar: "Ab" });
+  Object.assign(NAME, { abc: "Letters", spell: "Spelling", vocab: "Words", grammar: "Sentences" });
+  const slotOf = (op) => SLOT[op] || op;
+  const subject = () => settings.subject === "english" ? "english" : "math";
+  const topicsFor = (subj) => subj === "english" ? ENG_TOPICS : ["add", "sub", "mul", "div"];
+  const activeOps = () => subject() === "english" ? settings.engOps : settings.ops;
+  const ENG_LEVEL = { easy: 0, medium: 1, hard: 2, harder: 3 };
+  const ENG_HINT = [
+    "Easy: next letter, capital and small letters, first letter of a picture, a or an.",
+    "Medium: missing letters, picture words, number words, one and two.",
+    "Hard: spell the picture, is / am / are, find the picture.",
+    "Harder (Class 2): ABC order, mixed-up words, opposites, plurals with -es.",
+  ];
+
+  const PICS = {
+    cat: "🐱", dog: "🐶", cow: "🐄", hen: "🐔", pig: "🐷", fox: "🦊", bee: "🐝", ant: "🐜", owl: "🦉", egg: "🥚",
+    bus: "🚌", car: "🚗", sun: "☀️", bed: "🛏️", hat: "🎩", pen: "🖊️", box: "📦", key: "🔑", van: "🚐", web: "🕸️",
+    fish: "🐟", duck: "🦆", ball: "⚽", book: "📖", tree: "🌳", star: "⭐", moon: "🌙", bird: "🐦", frog: "🐸", lion: "🦁",
+    kite: "🪁", cake: "🎂", milk: "🥛", rose: "🌹", ship: "🚢", goat: "🐐", bell: "🔔", door: "🚪", hand: "✋", boat: "⛵",
+    rain: "🌧️", apple: "🍎", mango: "🥭", house: "🏠", horse: "🐴", chair: "🪑", clock: "🕐", train: "🚆", tiger: "🐯", zebra: "🦓",
+    queen: "👸", king: "🤴", juice: "🧃", bread: "🍞", grapes: "🍇", sheep: "🐑", snake: "🐍", whale: "🐋", truck: "🚚", plane: "✈️",
+  };
+  const W3 = ["cat", "dog", "cow", "hen", "pig", "fox", "bee", "ant", "owl", "egg", "bus", "car", "sun", "bed", "hat", "pen", "box", "key", "van", "web"];
+  const W4 = ["fish", "duck", "ball", "book", "tree", "star", "moon", "bird", "frog", "lion", "kite", "cake", "milk", "rose", "ship", "goat", "bell", "door", "hand", "boat"];
+  const W5 = ["apple", "mango", "house", "horse", "chair", "clock", "train", "tiger", "zebra", "queen", "juice", "bread", "sheep", "snake", "whale", "truck", "plane"];
+  const COLOURS = { red: "🔴", blue: "🔵", green: "🟢", yellow: "🟡", black: "⚫", white: "⚪", orange: "🟠", purple: "🟣", brown: "🟤" };
+  const NUMS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+  const OPPOSITES = [["big", "small"], ["hot", "cold"], ["up", "down"], ["happy", "sad"], ["day", "night"], ["fast", "slow"],
+    ["tall", "short"], ["old", "new"], ["in", "out"], ["good", "bad"], ["wet", "dry"], ["full", "empty"], ["open", "close"], ["yes", "no"], ["boy", "girl"]];
+  const AN_WORDS = [["apple", "🍎"], ["egg", "🥚"], ["ant", "🐜"], ["owl", "🦉"], ["umbrella", "☂️"], ["orange", "🍊"], ["ice cream", "🍦"], ["ox", "🐂"]];
+  const A_WORDS = [["ball", "⚽"], ["cat", "🐱"], ["dog", "🐶"], ["book", "📖"], ["kite", "🪁"], ["banana", "🍌"], ["house", "🏠"], ["pen", "🖊️"], ["tree", "🌳"], ["fish", "🐟"]];
+  const BE = [["I", "am", "happy"], ["She", "is", "my sister"], ["He", "is", "tall"], ["They", "are", "friends"], ["We", "are", "in class one"],
+    ["It", "is", "a cat"], ["You", "are", "my friend"], ["The sun", "is", "hot"], ["The birds", "are", "singing"], ["I", "am", "six years old"], ["My mother", "is", "kind"], ["The apples", "are", "red"]];
+  const ES_WORDS = [["box", "boxes"], ["bus", "buses"], ["fox", "foxes"], ["dress", "dresses"], ["glass", "glasses"], ["watch", "watches"], ["dish", "dishes"], ["brush", "brushes"]];
+  const S_WORDS = ["cat", "dog", "pen", "book", "tree", "star", "ball", "kite", "duck", "bird", "cake", "boat"];
+
+  const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rand(0, i); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const blank = `<span class="blank">?</span>`;
+  // Pick wrong options that differ from the answer.
+  const options = (ans, pool, n = 3) => shuffle([ans, ...shuffle(pool.filter((x) => x !== ans)).slice(0, n - 1)]);
+
+  // Each kind of question: the topic it belongs to and the first level that uses it.
+  const ENG_KINDS = [
+    { op: "abc", min: 0, make() {
+        const i = rand(0, 22), lower = Math.random() < .4, seq = ABC.slice(i, i + 3), next = ABC[i + 3];
+        const s = lower ? seq.toLowerCase() : seq, ans = lower ? next.toLowerCase() : next;
+        return { q: `${s.split("").join(" ")} ${blank}`, text: `${s.split("").join(" ")} ?`, ans, say: "Which letter comes next?" };
+      } },
+    { op: "abc", min: 0, make() {
+        const L = pick(ABC.split("")), toSmall = Math.random() < .5;
+        return toSmall
+          ? { q: `<b class="big-letter">${L}</b>`, text: `small letter of ${L}`, ans: L.toLowerCase(), cs: true, say: "Write the small letter." }
+          : { q: `<b class="big-letter">${L.toLowerCase()}</b>`, text: `capital letter of ${L.toLowerCase()}`, ans: L, cs: true, say: "Write the capital letter." };
+      } },
+    { op: "abc", min: 1, make() {
+        const i = rand(0, 23), a = ABC[i], b = ABC[i + 1], c = ABC[i + 2];
+        return { q: `${a} ${blank} ${c}`, text: `${a} ? ${c}`, ans: b, say: "Which letter is missing?" };
+      } },
+    { op: "abc", min: 2, make() {
+        const i = rand(1, 25), lower = Math.random() < .5, L = lower ? ABC[i].toLowerCase() : ABC[i], ans = lower ? ABC[i - 1].toLowerCase() : ABC[i - 1];
+        return { q: `${blank} ${L}`, text: `? ${L}`, ans, say: "Which letter comes before?" };
+      } },
+    { op: "abc", min: 3, make() {
+        const ws = shuffle([...W3, ...W4]).filter((w, k, arr) => arr.findIndex((x) => x[0] === w[0]) === k).slice(0, 3);
+        const ans = ws.slice().sort()[0];
+        return { q: ws.join(" · "), text: `first in ABC order: ${ws.join(", ")}`, ans, choices: shuffle(ws), say: "Which word comes first in ABC order?" };
+      } },
+    { op: "spell", min: 0, make() {
+        const w = pick(W3);
+        return { pic: PICS[w], q: `${blank}${w.slice(1)}`, text: `${PICS[w]} ?${w.slice(1)}`, ans: w[0], say: "Write the first letter." };
+      } },
+    { op: "spell", min: 1, make() {
+        const w = pick([...W3, ...W4]), k = rand(1, w.length - 1);
+        return { pic: PICS[w], q: `${w.slice(0, k)}${blank}${w.slice(k + 1)}`, text: `${PICS[w]} ${w.slice(0, k)}?${w.slice(k + 1)}`, ans: w[k], say: "Write the missing letter." };
+      } },
+    { op: "spell", min: 2, make() {
+        const w = pick([...W3, ...W4]);
+        return { pic: PICS[w], q: `<span class="letter-boxes">${"▢ ".repeat(w.length).trim()}</span>`, text: `${PICS[w]} spell it`, ans: w, say: `Spell the word (${w.length} letters).` };
+      } },
+    { op: "spell", min: 3, make() {
+        const w = pick(W5); let mixed = w;
+        while (mixed === w) mixed = shuffle(w.split("")).join("");
+        return { pic: PICS[w], q: mixed.split("").join(" "), text: `${PICS[w]} ${mixed}`, ans: w, say: "Put the letters in order." };
+      } },
+    { op: "vocab", min: 0, make() {
+        const w = pick([...W3, ...W4]);
+        return { pic: PICS[w], q: "", text: `${PICS[w]} = ?`, ans: w, choices: options(w, [...W3, ...W4]), say: "What is this?" };
+      } },
+    { op: "vocab", min: 0, make() {
+        const c = pick(Object.keys(COLOURS));
+        return { pic: COLOURS[c], q: "", text: `${COLOURS[c]} colour`, ans: c, choices: options(c, Object.keys(COLOURS)), say: "What colour is this?" };
+      } },
+    { op: "vocab", min: 1, make() {
+        const n = rand(1, 10);
+        return { q: `<b class="big-letter">${n}</b>`, text: `${n} in words`, ans: NUMS[n], choices: options(NUMS[n], NUMS.slice(1)), say: "Which word is this number?" };
+      } },
+    { op: "vocab", min: 1, make() {
+        const L = pick("bcdfhkmprstw".split("")), right = pick([...W3, ...W4].filter((w) => w[0] === L)) || "ball";
+        const wrong = shuffle([...W3, ...W4].filter((w) => w[0] !== right[0])).slice(0, 2);
+        return { q: `<b class="big-letter">${right[0]}</b>`, text: `starts with ${right[0]}`, ans: right, choices: shuffle([right, ...wrong]), say: `Which word starts with “${right[0]}”?` };
+      } },
+    { op: "vocab", min: 2, make() {
+        const w = pick([...W3, ...W4, ...W5]);
+        const others = shuffle([...W3, ...W4, ...W5].filter((x) => x !== w)).slice(0, 2);
+        return { q: `<b class="word">${w}</b>`, text: `find the picture: ${w}`, ans: PICS[w], choices: shuffle([PICS[w], ...others.map((x) => PICS[x])]), emoji: true, say: "Find the picture." };
+      } },
+    { op: "vocab", min: 3, make() {
+        const [x, y] = pick(OPPOSITES), flip = Math.random() < .5, from = flip ? y : x, to = flip ? x : y;
+        return { q: `<b class="word">${from}</b> ↔ ${blank}`, text: `opposite of ${from}`, ans: to, choices: options(to, OPPOSITES.flat().filter((w) => w !== from)), say: "Choose the opposite." };
+      } },
+    { op: "grammar", min: 0, make() {
+        const useAn = Math.random() < .5, [w, pic] = pick(useAn ? AN_WORDS : A_WORDS), ans = useAn ? "an" : "a";
+        return { pic, q: `${blank} ${w}`, text: `? ${w}`, ans, choices: ["a", "an"], say: "a or an?" };
+      } },
+    { op: "grammar", min: 1, make() {
+        const w = pick(S_WORDS), n = rand(2, 4);
+        return { pic: PICS[w].repeat(n), q: `one ${w}, ${NUMS[n]} ${blank}`, text: `one ${w}, ${NUMS[n]} ?`, ans: w + "s", choices: shuffle([w, w + "s"]), say: "Choose the right word." };
+      } },
+    { op: "grammar", min: 2, make() {
+        const [who, be, rest] = pick(BE);
+        return { q: `${who} ${blank} ${rest}.`, text: `${who} ? ${rest}.`, ans: be, choices: ["am", "is", "are"], say: "am, is or are?" };
+      } },
+    { op: "grammar", min: 3, make() {
+        const [one, many] = pick(ES_WORDS), n = rand(2, 5);
+        return { q: `one ${one}, ${NUMS[n]} ${blank}`, text: `one ${one}, ${NUMS[n]} ?`, ans: many, say: "Write the word for more than one." };
+      } },
+  ];
+
+  function makeEnglish(op) {
+    const lv = ENG_LEVEL[settings.level] ?? 0;
+    // Use this level's kinds plus the level just below, so each level feels new but not too hard.
+    let kinds = ENG_KINDS.filter((k) => k.op === op && k.min <= lv && k.min >= lv - 1);
+    if (!kinds.length) kinds = ENG_KINDS.filter((k) => k.op === op && k.min <= lv);
+    const k = pick(kinds), p = k.make();
+    return { op, eng: true, ...p };
+  }
+
+  function isRight(p, g) {
+    if (g === undefined || g === null || String(g).trim() === "") return false;
+    if (!p.eng) return Number(g) === p.ans;
+    return p.cs ? String(g).trim() === p.ans : String(g).trim().toLowerCase() === String(p.ans).toLowerCase();
+  }
+  // Question as plain text for the answer review.
+  const qText = (p) => p.eng ? `${esc(p.text)} →` : `${p.a} ${SYM[p.op]} ${p.b} =`;
+
   function makeSheet() {
+    const eng = subject() === "english";
     const c = cfg(), list = [], seen = new Set();
-    const ops = settings.ops.length ? settings.ops : ["add"];
+    const ops = activeOps().length ? activeOps() : topicsFor(subject()).slice(0, 1);
+    const key = (p) => p.eng ? p.op + p.text : p.op + p.a + "," + p.b;
     for (let i = 0; i < settings.count; i++) {
       const op = ops[i % ops.length];
       let p, tries = 0;
-      do { p = makeProblem(op, c); tries++; } while (seen.has(op + p.a + "," + p.b) && tries < 40);
-      seen.add(op + p.a + "," + p.b);
+      do { p = eng ? makeEnglish(op) : makeProblem(op, c); tries++; } while (seen.has(key(p)) && tries < 40);
+      seen.add(key(p));
       list.push(p);
     }
     // shuffle so operations are mixed
@@ -808,10 +1008,27 @@
 
   function renderSheet() {
     sheetEl.innerHTML = "";
-    sheetEl.classList.toggle("vertical", settings.layout === "vertical");
+    const eng = problems.some((p) => p.eng);
+    sheetEl.classList.toggle("vertical", !eng && settings.layout === "vertical");
+    sheetEl.classList.toggle("eng", eng);
     problems.forEach((p, i) => {
       const card = document.createElement("div");
       card.className = "card"; card.dataset.op = p.op;
+      if (p.eng) {
+        const answerBox = p.choices
+          ? `<div class="choices" role="group" aria-label="${esc(p.say)}">${p.choices.map((c) =>
+              `<button type="button" class="choice${p.emoji ? " emoji" : ""}" data-v="${esc(c)}" aria-pressed="false" disabled>${esc(c)}</button>`).join("")}</div>
+             <input id="ans${i}" type="hidden" data-kind="choice">`
+          : `<input class="word-in" id="ans${i}" type="text" data-kind="word" maxlength="12" placeholder=" " autocomplete="off"
+               autocapitalize="off" autocorrect="off" spellcheck="false" style="width:${Math.max(3, String(p.ans).length + 2)}ch"
+               aria-label="${esc(p.say)}" disabled>`;
+        card.innerHTML =
+          `<div class="qn"><span>Q${i + 1}</span><em>${NAME[p.op]}</em></div>
+           <div class="eq"><div class="say">${esc(p.say)}</div>${p.pic ? `<div class="pic" aria-hidden="true">${p.pic}</div>` : ""}
+             <div class="prompt">${p.q}</div>${answerBox}</div>`;
+        sheetEl.appendChild(card);
+        return;
+      }
       const wide = String(p.ans).length > 2 ? " wide" : "";
       const label = `Answer for ${p.a} ${NAME[p.op]} ${p.b}`;
       if (settings.layout === "vertical") {
@@ -850,15 +1067,24 @@
 
   sheetEl.addEventListener("input", (e) => {
     if (e.target.tagName !== "INPUT") return;
-    e.target.value = e.target.value.replace(/[^0-9]/g, "");
+    e.target.value = e.target.dataset.kind === "word" ? e.target.value.replace(/[^a-zA-Z]/g, "") : e.target.value.replace(/[^0-9]/g, "");
     updateProgress();
+  });
+  sheetEl.addEventListener("click", (e) => {
+    const b = e.target.closest(".choice"); if (!b || b.disabled) return;
+    const card = b.closest(".card"), input = card.querySelector('input[data-kind="choice"]');
+    card.querySelectorAll(".choice").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    input.value = b.dataset.v;
+    updateProgress();
+    onAnswered();
   });
   sheetEl.addEventListener("change", (e) => { if (e.target.tagName === "INPUT" && e.target.value) onAnswered(); });
   sheetEl.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" || e.target.tagName !== "INPUT") return;
     e.preventDefault();
     const all = inputs(), i = all.indexOf(e.target);
-    const next = all.slice(i + 1).find((x) => !x.value) || all.find((x) => !x.value);
+    const open = (x) => !x.value && x.type !== "hidden";
+    const next = all.slice(i + 1).find(open) || all.find(open);
     if (next) next.focus(); else $("finishBtn").focus();
   });
 
@@ -884,6 +1110,7 @@
     sheetEl.classList.toggle("locked", locked);
     $("veil").hidden = !locked;
     inputs().forEach((x) => x.disabled = locked);
+    sheetEl.querySelectorAll(".choice").forEach((x) => x.disabled = locked);
     if (locked) { $("veilTitle").textContent = title; $("veilText").textContent = text; $("veilBtn").textContent = btnLabel; }
   }
 
@@ -943,7 +1170,7 @@
     const given = inputs().map((x) => x.value.trim());
     let correct = 0; const byOp = {};
     problems.forEach((p, i) => {
-      const ok = given[i] !== "" && Number(given[i]) === p.ans;
+      const ok = isRight(p, given[i]);
       if (ok) correct++;
       byOp[p.op] = byOp[p.op] || { ok: 0, n: 0 }; byOp[p.op].n++; if (ok) byOp[p.op].ok++;
     });
@@ -965,11 +1192,11 @@
     $("rOps").innerHTML = Object.keys(byOp).map((op) =>
       `<span class="op-pill" data-op="${op}">${SYM[op]} ${NAME[op]}: ${byOp[op].ok}/${byOp[op].n}</span>`).join("");
     $("rList").innerHTML = problems.map((p, i) => {
-      const g = given[i], ok = g !== "" && Number(g) === p.ans;
+      const g = given[i], ok = isRight(p, g);
       const tail = ok ? `<span class="right">${p.ans}</span>`
         : g === "" ? `<span class="right">${p.ans}</span> <span class="blank">(empty)</span>`
         : `<span class="right">${p.ans}</span><span class="yours">${g}</span>`;
-      return `<div class="rv ${ok ? "ok" : "no"}"><span>${p.a} ${SYM[p.op]} ${p.b} = ${tail}</span><span class="mark">${ok ? "✓" : "✗"}</span></div>`;
+      return `<div class="rv ${ok ? "ok" : "no"}"><span>${qText(p)} ${tail}</span><span class="mark">${ok ? "✓" : "✗"}</span></div>`;
     }).join("");
 
     const before = starsEarned(n);
@@ -979,9 +1206,11 @@
       world: cur ? cur.w : null, buddy: cur ? cur.b.name : null,
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
       date: new Date().toISOString(), name: n, level: settings.level,
-      ops: ["add", "sub", "mul", "div"].filter((op) => byOp[op]), minutes: settings.minutes, timeUp: !!timeUp,
+      subject: subject(), ops: topicsFor(subject()).filter((op) => byOp[op]), minutes: settings.minutes, timeUp: !!timeUp,
       correct, total, pct, stars, seconds: Math.round(elapsed), byOp,
-      items: problems.map((p, i) => ({ a: p.a, op: p.op, b: p.b, ans: p.ans, given: given[i] })),
+      items: problems.map((p, i) => p.eng
+        ? { eng: true, op: p.op, text: p.text, ans: p.ans, cs: !!p.cs, given: given[i] }
+        : { a: p.a, op: p.op, b: p.b, ans: p.ans, given: given[i] }),
     });
 
     $("rRank").hidden = !cur;
@@ -1099,7 +1328,7 @@
   };
   const WORLD = {
     princess: {
-      title: (n) => `${n}'s Royal Math`, pick: "Choose your princess", goal: "castle",
+      title: (n) => `${n}'s Royal ${subject() === "english" ? "English" : "Math"}`, pick: "Choose your princess", goal: "castle",
       start: ["Let's go to the castle!", "Ready, set, sparkle!"],
       answer: ["Sparkly!", "Wonderful!", "Keep going!", "You're magic!", "Royal work!", "Twinkle twinkle!", "So clever!"],
       half: "Halfway to the castle!", near: "The castle is so close!", all: "All done! Press Finish 👑",
@@ -1109,7 +1338,7 @@
       chime: [988, 1319],
     },
     space: {
-      title: (n) => `${n}'s Space Math`, pick: "Choose your space friend", goal: "planet",
+      title: (n) => `${n}'s Space ${subject() === "english" ? "English" : "Math"}`, pick: "Choose your space friend", goal: "planet",
       start: ["3, 2, 1, blast off!", "Engines on!"],
       answer: ["Zoom!", "Great flying!", "Rocket power!", "Out of this world!", "Super!", "Keep going, pilot!", "Whoosh!"],
       half: "Halfway to the planet!", near: "Planet ahead!", all: "Landing time! Press Finish 🚀",
@@ -1481,7 +1710,7 @@
     const cb = currentBuddy();
     if (cb && cb.b.key) document.body.dataset.pal = cb.b.key; else delete document.body.dataset.pal;
     const n = settings.name.trim();
-    $("title").textContent = w ? WORLD[w].title(n || "My") .replace(/^My's/, "My") : (n ? `${n}'s Math Sheet` : "My Math Sheet");
+    $("title").textContent = w ? WORLD[w].title(n || "My") .replace(/^My's/, "My") : (n ? `${n}'s ${subject() === "english" ? "English" : "Math"} Sheet` : `My ${subject() === "english" ? "English" : "Math"} Sheet`);
     renderBuddyPicker();
     renderScoreboard();
     const cur = currentBuddy();
@@ -1615,15 +1844,22 @@
 
   // ---------- Settings UI ----------
   function syncChips() {
-    document.querySelectorAll("#opChips .chip").forEach((b) => b.setAttribute("aria-pressed", settings.ops.includes(b.dataset.op)));
+    const subj = subject();
+    $("opChips").innerHTML = topicsFor(subj).map((op) =>
+      `<button type="button" class="chip op-chip" data-op="${op}" aria-pressed="${activeOps().includes(op)}"><span class="sym">${SYM[op]}</span>${NAME[op]}</button>`).join("");
+    document.querySelectorAll("#subjectChips .chip").forEach((b) => b.setAttribute("aria-pressed", b.dataset.subject === subj));
+    $("layoutChips").closest(".group").hidden = subj === "english";
+    document.querySelector('#levelChips [data-level="custom"]').hidden = subj === "english";
+    if (subj === "english" && settings.level === "custom") settings.level = "easy";
+    $("subTitle").textContent = subj === "english" ? "Class 1 practice · Letters, spelling, words and sentences" : "Class 1 practice · Add, take away, times and share";
     document.querySelectorAll("#levelChips .chip").forEach((b) => b.setAttribute("aria-pressed", b.dataset.level === settings.level));
     document.querySelectorAll("#countChips .chip").forEach((b) => b.setAttribute("aria-pressed", +b.dataset.count === settings.count));
     document.querySelectorAll("#worldChips .chip").forEach((b) => b.setAttribute("aria-pressed", b.dataset.world === settings.world));
     document.querySelectorAll("#layoutChips .chip").forEach((b) => b.setAttribute("aria-pressed", b.dataset.layout === settings.layout));
     document.querySelectorAll("#timerChips .chip").forEach((b) => b.setAttribute("aria-pressed", +b.dataset.timer === settings.minutes));
-    $("customBox").hidden = settings.level !== "custom";
+    $("customBox").hidden = settings.level !== "custom" || subj === "english";
     const c = settings.custom;
-    $("levelHint").textContent = settings.level === "custom"
+    $("levelHint").textContent = subj === "english" ? ENG_HINT[ENG_LEVEL[settings.level] ?? 0] : settings.level === "custom"
       ? `Custom: + and − up to ${c.sumMax}, tables 1 to ${c.tableMax}, up to ×${c.multMax}.` : LEVELS[settings.level].hint;
     $("soundBtn").textContent = settings.sound ? "🔊 Sound on" : "🔇 Sound off";
     $("soundBtn").setAttribute("aria-pressed", settings.sound);
@@ -1632,10 +1868,14 @@
 
   $("opChips").addEventListener("click", (e) => {
     const b = e.target.closest(".chip"); if (!b) return;
-    const op = b.dataset.op;
-    if (settings.ops.includes(op)) { if (settings.ops.length > 1) settings.ops = settings.ops.filter((o) => o !== op); }
-    else settings.ops = ["add", "sub", "mul", "div"].filter((o) => o === op || settings.ops.includes(o));
+    const op = b.dataset.op, key = subject() === "english" ? "engOps" : "ops", cur = settings[key];
+    if (cur.includes(op)) { if (cur.length > 1) settings[key] = cur.filter((o) => o !== op); }
+    else settings[key] = topicsFor(subject()).filter((o) => o === op || cur.includes(o));
     changed();
+  });
+  $("subjectChips").addEventListener("click", (e) => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    settings.subject = b.dataset.subject; changed(); renderWorld();
   });
   $("levelChips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (b) { settings.level = b.dataset.level; changed(); } });
   $("countChips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (b) { settings.count = +b.dataset.count; changed(); } });
@@ -1737,10 +1977,10 @@
     list.forEach((r) => Object.entries(r.byOp || {}).forEach(([op, v]) => {
       ops[op] = ops[op] || { ok: 0, n: 0 }; ops[op].ok += v.ok; ops[op].n += v.n;
     }));
-    const opBars = ["add", "sub", "mul", "div"].filter((op) => ops[op]).map((op) => {
+    const opBars = [...topicsFor("math"), ...ENG_TOPICS].filter((op) => ops[op]).map((op) => {
       const p = Math.round(ops[op].ok / ops[op].n * 100);
       return `<div class="opbar"><div class="opbar-top"><span>${SYM[op]} ${NAME[op]}</span><span>${p}% · ${ops[op].ok}/${ops[op].n}</span></div>
-        <div class="opbar-track"><i style="width:${p}%;background:var(--${op})"></i></div></div>`;
+        <div class="opbar-track"><i style="width:${p}%;background:var(--${slotOf(op)})"></i></div></div>`;
     }).join("");
 
     // Table (newest first)
@@ -1749,7 +1989,7 @@
         <td>${fmtDate(r.date)}</td>
         <td>${esc(r.name || "—")}</td>
         <td>${friendCell(r)}</td>
-        <td>${LEVEL_NAME[r.level] || esc(r.level)}</td>
+        <td>${r.subject === "english" ? "🔤 English" : "📐 Math"} · ${LEVEL_NAME[r.level] || esc(r.level)}</td>
         <td><span class="op-dots">${(r.ops || []).map((op) => `<i data-op="${op}" title="${NAME[op]}">${SYM[op]}</i>`).join("")}</span></td>
         <td><span class="pct-pill ${pctClass(r.pct)}">${r.correct}/${r.total} · ${r.pct}%</span></td>
         <td>${fmt(r.seconds).replace(/^0/, "")}${r.timeUp ? " ⏰" : ""}</td>
@@ -1802,11 +2042,11 @@
 
   function detailRow(r) {
     const items = (r.items || []).map((it) => {
-      const ok = it.given !== "" && Number(it.given) === it.ans;
+      const ok = isRight(it, it.given);
       const tail = ok ? `<span class="right">${it.ans}</span>`
         : it.given === "" ? `<span class="right">${it.ans}</span> <span class="blank">(empty)</span>`
         : `<span class="right">${it.ans}</span><span class="yours">${esc(it.given)}</span>`;
-      return `<div class="rv ${ok ? "ok" : "no"}"><span>${it.a} ${SYM[it.op]} ${it.b} = ${tail}</span><span class="mark">${ok ? "✓" : "✗"}</span></div>`;
+      return `<div class="rv ${ok ? "ok" : "no"}"><span>${qText(it)} ${tail}</span><span class="mark">${ok ? "✓" : "✗"}</span></div>`;
     }).join("");
     return `<tr class="detail"><td colspan="9"><div class="review">${items}</div></td></tr>`;
   }
