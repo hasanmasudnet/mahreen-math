@@ -107,6 +107,7 @@
   .op-chip[data-op="mul"] .sym { background: var(--mul); }
   .op-chip[data-op="div"] .sym { background: var(--div); }
   .op-chip[aria-pressed="false"] { opacity: .55; }
+  .op-chip[aria-pressed="true"]::after { content: "✓"; font-weight: 800; color: var(--good); }
   .op-chip[aria-pressed="false"] .sym { filter: grayscale(.6); }
   .stars { color: var(--mul); letter-spacing: 1px; }
 
@@ -494,10 +495,8 @@
   .sb-card.locked .sb-av svg { filter: brightness(0); opacity: .18; }
   .sb-card.locked .sb-av * { animation: none !important; }
   .pick-score { font-family: var(--display); font-weight: 700; font-size: 1.05rem; }
-  .journey-score {
-    position: absolute; left: 0; top: 0; z-index: 1; font-family: var(--display); font-weight: 700; font-size: 1.05rem;
-    background: var(--bg); border-radius: 99px; padding: 2px 12px;
-  }
+  .journey-score { font-family: var(--display); font-weight: 700; font-size: 1.05rem; margin-top: 4px; }
+  .journey-score:empty { display: none; }
   @media (max-width: 520px) {
     .sb-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .sb-av { width: 80px; height: 106px; }
@@ -586,6 +585,7 @@
           <button type="button" class="chip" data-level="easy" aria-pressed="true"><span class="stars">★</span>Easy</button>
           <button type="button" class="chip" data-level="medium" aria-pressed="false"><span class="stars">★★</span>Medium</button>
           <button type="button" class="chip" data-level="hard" aria-pressed="false"><span class="stars">★★★</span>Hard</button>
+          <button type="button" class="chip" data-level="harder" aria-pressed="false"><span class="stars">★★★★</span>Harder · Class 2</button>
           <button type="button" class="chip" data-level="custom" aria-pressed="false">⚙️ Custom</button>
         </div>
       </div>
@@ -643,6 +643,7 @@
         <b id="clockLabel">Stopwatch</b>
         <span><strong id="doneCount">0</strong> of <span id="totalCount">10</span> answered</span>
         <div class="progress" aria-hidden="true"><i id="progressFill"></i></div>
+        <span class="journey-score" id="journeyScore"></span>
       </div>
     </div>
     <div class="controls">
@@ -651,7 +652,6 @@
       <button class="btn finish" id="finishBtn" type="button" disabled>🏁 Finish</button>
     </div>
     <div class="journey" id="journey" aria-hidden="true">
-      <div class="journey-score" id="journeyScore"></div>
       <div class="track"><div class="trail" id="trail"></div></div>
       <div class="goal" id="goal"></div>
       <div class="walker" id="walker"><div class="buddy" id="walkerArt" style="width:100%;height:100%"></div><div class="bubble" id="bubble" hidden></div></div>
@@ -735,6 +735,8 @@
     easy:   { sumMax: 20,  tableMax: 3,  multMax: 10, hint: "Easy: + and − from 10 to 20, tables of 2 and 3." },
     medium: { sumMax: 50,  tableMax: 5,  multMax: 10, hint: "Medium: + and − up to 50, tables 2 to 5." },
     hard:   { sumMax: 100, tableMax: 10, multMax: 10, hint: "Hard: + and − up to 100, tables 2 to 10." },
+    harder: { sumMax: 999, tableMax: 10, multMax: 12, big: true,
+              hint: "Harder (Class 2): + and − with 3-digit numbers, always carrying or borrowing, tables 2 to 10 up to ×12." },
   };
 
   const settings = { ops: ["add", "sub", "mul", "div"], level: "easy", count: 10, minutes: 0, layout: "vertical", world: "princess", buddy: { princess: 0, space: 0 }, name: "Mahreen",
@@ -744,6 +746,9 @@
     if (saved) Object.assign(settings, saved);
   } catch (e) {}
   if (![10, 15, 20].includes(settings.count)) settings.count = 10;
+  if (!LEVELS[settings.level] && settings.level !== "custom") settings.level = "easy";
+  // Version 2: turn all four operations back on once, in case one was switched off by mistake.
+  if (!(settings.v >= 2)) { settings.ops = ["add", "sub", "mul", "div"]; settings.v = 2; }
   const save = () => { try { localStorage.setItem("mathSheetSettings", JSON.stringify(settings)); } catch (e) {} };
 
   // ---------- Problem generation ----------
@@ -755,7 +760,17 @@
     // No give-away questions: no adding or taking away 0 or 1, no ×1 or ÷1,
     // and answers for + and − sit in the top half of the range.
     const lo = (max) => Math.min(2, max);
-    if (op === "add") {
+    if (c.big && op === "add") {
+      // Class 2: a 3-digit number plus a 2- or 3-digit number, with a carry in the ones.
+      let t = 0;
+      do { a = rand(100, 899); b = rand(12, 999 - a); t++; } while ((a % 10) + (b % 10) < 10 && t < 60);
+      ans = a + b;
+    } else if (c.big && op === "sub") {
+      // Class 2: borrowing in the ones, e.g. 523 − 178.
+      let t = 0;
+      do { a = rand(120, 999); b = rand(12, a - 10); t++; } while ((a % 10) >= (b % 10) && t < 60);
+      ans = a - b;
+    } else if (op === "add") {
       ans = rand(Math.max(4, Math.ceil(c.sumMax / 2)), c.sumMax);
       a = rand(2, ans - 2); b = ans - a;
     } else if (op === "sub") {
@@ -1425,6 +1440,7 @@
   function renderScoreboard() {
     const w = world();
     $("scoreboard").hidden = !w;
+    $("journeyScore").textContent = "";
     if (!w) return;
     const rows = ranking(myTests(), w), have = starsEarned(settings.name), cur = currentBuddy();
     const top = rows[0].stars > 0;
@@ -1661,7 +1677,7 @@
 
   // ---------- Progress history ----------
   const HKEY = "mathSheetHistory";
-  const LEVEL_NAME = { easy: "Easy", medium: "Medium", hard: "Hard", custom: "Custom" };
+  const LEVEL_NAME = { easy: "Easy", medium: "Medium", hard: "Hard", harder: "Harder", custom: "Custom" };
   let pvFilter = "__all";
   let openRow = null;
 

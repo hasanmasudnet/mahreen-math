@@ -2,7 +2,7 @@
 
 Big-number math practice for Class 1: addition, subtraction, multiplication and division.
 
-- Easy / Medium / Hard / Custom difficulty
+- Easy / Medium / Hard / Harder (Class 2: 3-digit carrying and borrowing, tables to ×12) / Custom difficulty
 - Up-and-down (column) or side-by-side question layout
 - Worlds: 👑 Princess castle, 🚀 Space adventure (astronauts and robots) or ✏️ Classic.
   An animated friend walks to her kingdom (or a planet) as questions are answered, cheers
