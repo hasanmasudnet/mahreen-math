@@ -305,7 +305,7 @@
   .opbar-track { height: 12px; border-radius: 99px; background: var(--bg); overflow: hidden; }
   .opbar-track i { display: block; height: 100%; border-radius: 99px; }
   .table-wrap { overflow-x: auto; }
-  table.hist { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; min-width: 560px; }
+  table.hist { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; min-width: 700px; }
   table.hist th { text-align: left; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); padding: 8px 10px; border-bottom: 2px solid var(--line); }
   table.hist td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
   table.hist tr.row { cursor: pointer; }
@@ -435,6 +435,42 @@
     background: var(--bg); border-radius: 18px; padding: 10px 16px; font-weight: 800; max-width: 340px; text-align: left;
   }
   .jewels { font-size: 1.5rem; letter-spacing: 2px; line-height: 1.3; text-align: center; max-width: 460px; }
+  /* Princess ranking */
+  .ranks { display: grid; gap: 8px; }
+  .rank-row {
+    display: grid; grid-template-columns: 44px 56px minmax(0, 1fr) auto; align-items: center; gap: 12px;
+    padding: 8px 14px; border-radius: 18px; background: var(--bg); border: 3px solid transparent;
+  }
+  .rank-row.top { background: linear-gradient(90deg, color-mix(in srgb, var(--mul) 28%, var(--bg)), var(--bg)); }
+  .rank-row.me { border-color: var(--accent); }
+  .medal { font-family: var(--display); font-weight: 700; font-size: 1.8rem; text-align: center; color: var(--ink-soft); line-height: 1; }
+  .rank-av { width: 56px; height: 74px; position: relative; }
+  .rank-row.top .rank-av::before { content: "👑"; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 1.2rem; z-index: 1; }
+  .rank-av.locked svg { filter: brightness(0); opacity: .18; }
+  .rank-av.locked * { animation: none !important; }
+  .rank-info b { font-family: var(--display); font-weight: 600; font-size: 1.15rem; }
+  .rank-info small { display: block; color: var(--ink-soft); font-weight: 700; line-height: 1.3; }
+  .rank-bar { height: 8px; border-radius: 99px; background: var(--paper); margin-top: 5px; overflow: hidden; }
+  .rank-bar i { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .6s; }
+  .rank-stars { font-family: var(--display); font-weight: 700; font-size: 1.4rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ranks.compact .rank-row { grid-template-columns: 34px 40px minmax(0, 1fr) auto; gap: 10px; padding: 4px 12px; }
+  .ranks.compact .rank-av { width: 40px; height: 52px; }
+  .ranks.compact .medal { font-size: 1.3rem; }
+  .ranks.compact .rank-stars { font-size: 1.1rem; }
+  .ranks.compact .rank-info b { font-size: 1rem; }
+  .result-rank { width: 100%; max-width: 540px; display: grid; gap: 10px; margin-top: 8px; }
+  .rank-news { font-family: var(--display); font-weight: 600; font-size: 1.25rem; text-align: center; margin: 0; text-wrap: balance; }
+  .rank-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .rank-head h3 { margin: 0; }
+  .mini-av { display: inline-block; width: 26px; height: 34px; vertical-align: middle; margin-right: 6px; }
+  .mini-av * { animation: none !important; }
+  @media (max-width: 520px) {
+    .rank-row { grid-template-columns: 32px 44px minmax(0, 1fr) auto; gap: 8px; padding: 6px 10px; }
+    .rank-av { width: 44px; height: 58px; }
+    .medal { font-size: 1.4rem; }
+    .rank-stars { font-size: 1.1rem; }
+  }
+
   .unlock {
     border: 3px dashed var(--accent); border-radius: 18px; padding: 10px 16px; font-weight: 800;
     display: flex; align-items: center; gap: 12px; animation: pop-in .5s cubic-bezier(.3,1.6,.5,1) .4s both;
@@ -607,6 +643,7 @@
       </div>
       <div class="jewels" id="rJewels"></div>
       <div class="unlock" id="rUnlock" hidden></div>
+      <div class="result-rank" id="rRank" hidden></div>
       <div class="stats">
         <div class="stat"><b id="rTime">0:00</b><span>Time taken</span></div>
         <div class="stat"><b id="rAvg">0s</b><span>Per question</span></div>
@@ -875,7 +912,10 @@
     }).join("");
 
     const before = starsEarned(n);
+    const cur = currentBuddy();
+    const rankBefore = cur ? rankPos(cur, n) : 0;
     recordTest({
+      world: cur ? cur.w : null, buddy: cur ? cur.b.name : null,
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
       date: new Date().toISOString(), name: n, level: settings.level,
       ops: ["add", "sub", "mul", "div"].filter((op) => byOp[op]), minutes: settings.minutes, timeUp: !!timeUp,
@@ -883,7 +923,7 @@
       items: problems.map((p, i) => ({ a: p.a, op: p.op, b: p.b, ans: p.ans, given: given[i] })),
     });
 
-    const cur = currentBuddy();
+    $("rRank").hidden = !cur;
     $("rBuddyRow").hidden = !cur; $("rJewels").hidden = !cur; $("rUnlock").hidden = true;
     if (cur) {
       const W = txt();
@@ -899,6 +939,14 @@
         $("rUnlock").hidden = false;
       }
       renderBuddyPicker();
+      const rows = ranking(loadHist().filter((r) => (r.name || "").trim() === n.trim()), cur.w);
+      const pos = rows.findIndex((r) => r.i === cur.i) + 1, mine = rows[pos - 1];
+      const news = !mine.stars ? `Keep trying! Every star helps ${cur.b.name} climb the ranking.`
+        : pos === 1 ? `${cur.b.name} is #1 with ⭐ ${mine.stars}! 👑`
+        : rows[pos - 2].stars === mine.stars ? `${cur.b.name} is tied with ${rows[pos - 2].b.name} at ⭐ ${mine.stars}! One more good test to take the lead!`
+        : rankBefore && pos < rankBefore ? `${cur.b.name} moved up to #${pos}! 🎉`
+        : `${cur.b.name} is #${pos} with ⭐ ${mine.stars}. ${rows[pos - 2].b.name} has ⭐ ${rows[pos - 2].stars}.`;
+      $("rRank").innerHTML = `<p class="rank-news">${news}</p>${rankHtml(rows, cur.w, cur.i, starsEarned(n), true)}`;
     }
 
     $("sheetWrap").hidden = true; $("bar").hidden = true; $("results").hidden = false;
@@ -1255,6 +1303,41 @@
     </svg>`;
   }
 
+  // Every test is scored to the friend chosen at the time; friends are ranked by stars earned.
+  function ranking(list, w) {
+    return BUDDIES[w].map((b, i) => {
+      const rs = list.filter((r) => r.world === w && r.buddy === b.name);
+      const stars = rs.reduce((t, r) => t + (r.stars || 0), 0);
+      return {
+        b, i, tests: rs.length, stars,
+        avg: rs.length ? Math.round(rs.reduce((t, r) => t + r.pct, 0) / rs.length) : 0,
+        best: rs.reduce((m, r) => Math.max(m, r.pct), 0),
+      };
+    }).sort((a, b) => b.stars - a.stars || b.avg - a.avg || b.tests - a.tests || a.i - b.i);
+  }
+  function rankPos(cur, name) {
+    const rows = ranking(loadHist().filter((r) => (r.name || "").trim() === name.trim()), cur.w);
+    return rows.findIndex((r) => r.i === cur.i) + 1;
+  }
+  function rankHtml(rows, w, meIndex, have, compact) {
+    const top = rows[0] && rows[0].stars > 0 ? rows[0].stars : 0;
+    const who = w === "space" ? "them" : "her";
+    return `<div class="ranks${compact ? " compact" : ""}">${rows.map((r, k) => {
+      const locked = UNLOCK[r.i] > have && !r.tests;
+      const medal = r.stars > 0 ? (["🥇", "🥈", "🥉"][k] || `#${k + 1}`) : "–";
+      const info = r.tests
+        ? `${r.tests} test${r.tests === 1 ? "" : "s"} · best ${r.best}% · average ${r.avg}%`
+        : locked ? `🔒 Unlocks at ⭐ ${UNLOCK[r.i]}` : `No tests yet. Choose ${who} and play!`;
+      return `<div class="rank-row${k === 0 && top ? " top" : ""}${r.i === meIndex ? " me" : ""}">
+        <span class="medal">${medal}</span>
+        <div class="buddy rank-av${locked ? " locked" : ""}${k === 0 && top ? " dance" : ""}">${buddySvg(w, r.i)}</div>
+        <div class="rank-info"><b>${locked ? "???" : r.b.name}</b>${compact && !r.tests ? "" : `<small>${info}</small>`}
+          <div class="rank-bar"><i style="width:${top ? r.stars / top * 100 : 0}%"></i></div></div>
+        <div class="rank-stars">⭐ ${r.stars}</div>
+      </div>`;
+    }).join("")}</div>`;
+  }
+
   function starsEarned(name) {
     return loadHist().filter((r) => (r.name || "").trim() === name.trim()).reduce((s, r) => s + (r.stars || 0), 0);
   }
@@ -1559,6 +1642,7 @@
       <tr class="row" data-id="${esc(r.id)}" tabindex="0" aria-expanded="${openRow === r.id}">
         <td>${fmtDate(r.date)}</td>
         <td>${esc(r.name || "—")}</td>
+        <td>${friendCell(r)}</td>
         <td>${LEVEL_NAME[r.level] || esc(r.level)}</td>
         <td><span class="op-dots">${(r.ops || []).map((op) => `<i data-op="${op}" title="${NAME[op]}">${SYM[op]}</i>`).join("")}</span></td>
         <td><span class="pct-pill ${pctClass(r.pct)}">${r.correct}/${r.total} · ${r.pct}%</span></td>
@@ -1575,6 +1659,7 @@
         <div class="tile"><span>Stars earned</span><b>⭐ ${stars}</b><small>out of ${n * 3}</small></div>
         <div class="tile"><span>Practice time</span><b>${Math.max(1, Math.round(secs / 60))} min</b><small>all tests together</small></div>
       </div>
+      ${rankCard(list)}
       <div class="pv-grid">
         <div class="pv-card"><h3>Score in each test</h3><div class="chart-box" id="chartBox">${chartSvg(list.slice(-30))}<div class="tip" id="tip" hidden></div></div></div>
         <div class="pv-card"><h3>Correct by topic</h3><div class="opbars">${opBars}</div></div>
@@ -1582,12 +1667,31 @@
       <div class="pv-card">
         <h3>All tests <span class="note">· tap a row to see the answers</span></h3>
         <div class="table-wrap"><table class="hist">
-          <thead><tr><th>When</th><th>Name</th><th>Level</th><th>Topics</th><th>Score</th><th>Time</th><th>Stars</th><th></th></tr></thead>
+          <thead><tr><th>When</th><th>Name</th><th>Friend</th><th>Level</th><th>Topics</th><th>Score</th><th>Time</th><th>Stars</th><th></th></tr></thead>
           <tbody>${rows}</tbody>
         </table></div>
       </div>
       <div class="actions"><button class="icon-btn" type="button" id="clearAllBtn">Delete all tests</button></div>`;
     bindChart(list.slice(-30));
+  }
+
+  let rankWorld = null;
+  function rankCard(list) {
+    const worlds = ["princess", "space"];
+    const used = worlds.filter((w) => list.some((r) => r.world === w));
+    if (!rankWorld || !worlds.includes(rankWorld)) rankWorld = world() || used[0] || "princess";
+    const label = { princess: "👑 Princess ranking", space: "🚀 Space friends ranking" };
+    const tabs = worlds.map((w) => `<button type="button" class="chip" data-rw="${w}" aria-pressed="${w === rankWorld}">${w === "princess" ? "👑 Princesses" : "🚀 Space friends"}</button>`).join("");
+    const cur = currentBuddy();
+    return `<div class="pv-card">
+      <div class="rank-head"><h3>${label[rankWorld]}</h3><div class="chips">${tabs}</div></div>
+      ${rankHtml(ranking(list, rankWorld), rankWorld, cur && cur.w === rankWorld ? cur.i : -1, starsEarned(settings.name), false)}
+      <p class="note" style="margin-top:8px">Each test counts for the friend who was chosen when it was taken. More stars means a higher place.</p>
+    </div>`;
+  }
+  function friendCell(r) {
+    const w = r.world, i = w && BUDDIES[w] ? BUDDIES[w].findIndex((b) => b.name === r.buddy) : -1;
+    return i < 0 ? "–" : `<span class="buddy mini-av">${buddySvg(w, i)}</span>${esc(r.buddy)}`;
   }
 
   function detailRow(r) {
@@ -1598,7 +1702,7 @@
         : `<span class="right">${it.ans}</span><span class="yours">${esc(it.given)}</span>`;
       return `<div class="rv ${ok ? "ok" : "no"}"><span>${it.a} ${SYM[it.op]} ${it.b} = ${tail}</span><span class="mark">${ok ? "✓" : "✗"}</span></div>`;
     }).join("");
-    return `<tr class="detail"><td colspan="8"><div class="review">${items}</div></td></tr>`;
+    return `<tr class="detail"><td colspan="9"><div class="review">${items}</div></td></tr>`;
   }
 
   // Line chart: score % per test, one series, 0–100 scale.
@@ -1655,6 +1759,8 @@
   }
 
   $("pvBody").addEventListener("click", (e) => {
+    const tab = e.target.closest("[data-rw]");
+    if (tab) { rankWorld = tab.dataset.rw; renderProgress(); return; }
     const del = e.target.closest("[data-del]");
     if (del) {
       e.stopPropagation();

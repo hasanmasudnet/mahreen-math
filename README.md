@@ -11,6 +11,9 @@ Big-number math practice for Class 1: addition, subtraction, multiplication and 
 - Princesses: Sofia, Elsa, Rapunzel, Snow White and Cinderella, each with her own kingdom
   (castle, ice palace, tower, cottage, pumpkin carriage), colours, background and rewards.
   The drawings are simple home-made fan art for family use.
+- Princess ranking: every test is scored to the princess (or space friend) chosen when it
+  was taken. The progress page ranks them by stars earned, with tests, best and average
+  scores, and the results screen shows where the chosen friend now stands.
 - Start, Pause and Finish timer (stopwatch or 2/5/10 minute countdown)
 - Automatic results with stars, time taken and answer review
 - Progress page: every finished test is saved in the browser, with a score chart,
