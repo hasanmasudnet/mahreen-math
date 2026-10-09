@@ -592,7 +592,6 @@
       <div class="group">
         <span class="label">Questions</span>
         <div class="chips" id="countChips">
-          <button type="button" class="chip" data-count="5" aria-pressed="false">5</button>
           <button type="button" class="chip" data-count="10" aria-pressed="true">10</button>
           <button type="button" class="chip" data-count="15" aria-pressed="false">15</button>
           <button type="button" class="chip" data-count="20" aria-pressed="false">20</button>
@@ -733,9 +732,9 @@
   const SYM = { add: "+", sub: "−", mul: "×", div: "÷" };
   const NAME = { add: "Addition", sub: "Subtraction", mul: "Multiplication", div: "Division" };
   const LEVELS = {
-    easy:   { sumMax: 10,  tableMax: 2,  multMax: 5,  hint: "Easy: + and − up to 10, tables of 1 and 2." },
-    medium: { sumMax: 20,  tableMax: 5,  multMax: 10, hint: "Medium: + and − up to 20, tables 1 to 5." },
-    hard:   { sumMax: 100, tableMax: 10, multMax: 10, hint: "Hard: + and − up to 100, tables 1 to 10." },
+    easy:   { sumMax: 20,  tableMax: 3,  multMax: 10, hint: "Easy: + and − from 10 to 20, tables of 2 and 3." },
+    medium: { sumMax: 50,  tableMax: 5,  multMax: 10, hint: "Medium: + and − up to 50, tables 2 to 5." },
+    hard:   { sumMax: 100, tableMax: 10, multMax: 10, hint: "Hard: + and − up to 100, tables 2 to 10." },
   };
 
   const settings = { ops: ["add", "sub", "mul", "div"], level: "easy", count: 10, minutes: 0, layout: "vertical", world: "princess", buddy: { princess: 0, space: 0 }, name: "Mahreen",
@@ -744,6 +743,7 @@
     const saved = JSON.parse(localStorage.getItem("mathSheetSettings") || "null");
     if (saved) Object.assign(settings, saved);
   } catch (e) {}
+  if (![10, 15, 20].includes(settings.count)) settings.count = 10;
   const save = () => { try { localStorage.setItem("mathSheetSettings", JSON.stringify(settings)); } catch (e) {} };
 
   // ---------- Problem generation ----------
@@ -752,15 +752,19 @@
 
   function makeProblem(op, c) {
     let a, b, ans;
+    // No give-away questions: no adding or taking away 0 or 1, no ×1 or ÷1,
+    // and answers for + and − sit in the top half of the range.
+    const lo = (max) => Math.min(2, max);
     if (op === "add") {
-      const min = c.sumMax > 20 ? 5 : 0;
-      a = rand(min, c.sumMax - min); b = rand(min > 0 ? 1 : 0, Math.max(0, c.sumMax - a)); ans = a + b;
+      ans = rand(Math.max(4, Math.ceil(c.sumMax / 2)), c.sumMax);
+      a = rand(2, ans - 2); b = ans - a;
     } else if (op === "sub") {
-      a = rand(Math.min(2, c.sumMax), c.sumMax); b = rand(0, a); ans = a - b;
+      a = rand(Math.max(4, Math.ceil(c.sumMax / 2)), c.sumMax);
+      b = rand(2, a - 2); ans = a - b;
     } else if (op === "mul") {
-      a = rand(1, c.tableMax); b = rand(1, c.multMax); if (Math.random() < .5) [a, b] = [b, a]; ans = a * b;
+      a = rand(lo(c.tableMax), c.tableMax); b = rand(lo(c.multMax), c.multMax); if (Math.random() < .5) [a, b] = [b, a]; ans = a * b;
     } else {
-      const d = rand(1, c.tableMax), q = rand(1, c.multMax); a = d * q; b = d; ans = q;
+      const d = rand(lo(c.tableMax), c.tableMax), q = rand(lo(c.multMax), c.multMax); a = d * q; b = d; ans = q;
     }
     return { op, a, b, ans };
   }
