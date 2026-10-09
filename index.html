@@ -452,7 +452,7 @@
   .rank-info small { display: block; color: var(--ink-soft); font-weight: 700; line-height: 1.3; }
   .rank-bar { height: 8px; border-radius: 99px; background: var(--paper); margin-top: 5px; overflow: hidden; }
   .rank-bar i { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .6s; }
-  .rank-stars { font-family: var(--display); font-weight: 700; font-size: 1.4rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .rank-stars { font-family: var(--display); font-weight: 700; font-size: 1.9rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .ranks.compact .rank-row { grid-template-columns: 34px 40px minmax(0, 1fr) auto; gap: 10px; padding: 4px 12px; }
   .ranks.compact .rank-av { width: 40px; height: 52px; }
   .ranks.compact .medal { font-size: 1.3rem; }
@@ -469,6 +469,41 @@
     .rank-av { width: 44px; height: 58px; }
     .medal { font-size: 1.4rem; }
     .rank-stars { font-size: 1.1rem; }
+  }
+
+  /* Scoreboard on the main page */
+  .scoreboard { display: grid; gap: 14px; }
+  .scoreboard h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.4rem, 4vw, 1.9rem); margin: 0; }
+  .sb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .sb-card {
+    font: inherit; color: var(--ink); background: var(--bg); border: 3px solid transparent; border-radius: 22px;
+    padding: 16px 10px 14px; display: grid; justify-items: center; align-content: start; gap: 4px; position: relative; cursor: pointer;
+    transition: transform .12s;
+  }
+  .sb-card:hover:not(.locked) { transform: translateY(-3px); }
+  .sb-card.first { background: linear-gradient(180deg, color-mix(in srgb, var(--mul) 38%, var(--bg)), var(--bg)); }
+  .sb-card.me { border-color: var(--accent); }
+  .sb-medal { position: absolute; top: 8px; left: 10px; font-family: var(--display); font-weight: 700; font-size: 2rem; line-height: 1; color: var(--ink-soft); }
+  .sb-now { position: absolute; top: 10px; right: 10px; background: var(--accent); color: #fff; font-size: .72rem; font-weight: 800; padding: 2px 9px; border-radius: 99px; }
+  .sb-av { width: 100px; height: 134px; position: relative; margin-top: 10px; }
+  .sb-card.first .sb-av::before { content: "👑"; position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: 1.7rem; z-index: 1; }
+  .sb-name { font-family: var(--display); font-weight: 600; font-size: 1.3rem; line-height: 1.1; }
+  .sb-score { font-family: var(--display); font-weight: 700; font-size: 2.8rem; line-height: 1; font-variant-numeric: tabular-nums; }
+  .sb-card small { color: var(--ink-soft); font-weight: 800; text-align: center; line-height: 1.3; }
+  .sb-card.locked { cursor: not-allowed; }
+  .sb-card.locked .sb-av svg { filter: brightness(0); opacity: .18; }
+  .sb-card.locked .sb-av * { animation: none !important; }
+  .pick-score { font-family: var(--display); font-weight: 700; font-size: 1.05rem; }
+  .journey-score {
+    position: absolute; left: 0; top: 0; z-index: 1; font-family: var(--display); font-weight: 700; font-size: 1.05rem;
+    background: var(--bg); border-radius: 99px; padding: 2px 12px;
+  }
+  @media (max-width: 520px) {
+    .sb-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sb-av { width: 80px; height: 106px; }
+    .sb-score { font-size: 2.2rem; }
+    .sb-name { font-size: 1.1rem; }
+    .sb-medal { font-size: 1.6rem; }
   }
 
   .unlock {
@@ -505,6 +540,12 @@
       <button class="btn ghost small" id="soundBtn" type="button" aria-pressed="true">🔊 Sound on</button>
     </div>
   </header>
+
+  <!-- Princess scoreboard -->
+  <section class="panel scoreboard no-print" id="scoreboard" hidden aria-labelledby="sbTitle">
+    <div class="rank-head"><h2 id="sbTitle">👑 Princess Scoreboard</h2><span class="note" id="sbNote"></span></div>
+    <div class="sb-grid" id="sbGrid"></div>
+  </section>
 
   <!-- Settings -->
   <section class="panel settings" id="settings" aria-labelledby="settingsTitle">
@@ -611,6 +652,7 @@
       <button class="btn finish" id="finishBtn" type="button" disabled>🏁 Finish</button>
     </div>
     <div class="journey" id="journey" aria-hidden="true">
+      <div class="journey-score" id="journeyScore"></div>
       <div class="track"><div class="trail" id="trail"></div></div>
       <div class="goal" id="goal"></div>
       <div class="walker" id="walker"><div class="buddy" id="walkerArt" style="width:100%;height:100%"></div><div class="bubble" id="bubble" hidden></div></div>
@@ -946,7 +988,7 @@
         : rows[pos - 2].stars === mine.stars ? `${cur.b.name} is tied with ${rows[pos - 2].b.name} at ⭐ ${mine.stars}! One more good test to take the lead!`
         : rankBefore && pos < rankBefore ? `${cur.b.name} moved up to #${pos}! 🎉`
         : `${cur.b.name} is #${pos} with ⭐ ${mine.stars}. ${rows[pos - 2].b.name} has ⭐ ${rows[pos - 2].stars}.`;
-      $("rRank").innerHTML = `<p class="rank-news">${news}</p>${rankHtml(rows, cur.w, cur.i, starsEarned(n), true)}`;
+      $("rRank").innerHTML = `<p class="rank-news">${news}</p>${rankHtml(rows, cur.w, cur.i, starsEarned(n), false)}`;
     }
 
     $("sheetWrap").hidden = true; $("bar").hidden = true; $("results").hidden = false;
@@ -1359,19 +1401,59 @@
     $("buddyGroup").hidden = !w;
     if (!w) return;
     const have = starsEarned(settings.name), cur = currentBuddy();
+    const score = {}; ranking(myTests(), w).forEach((r) => { score[r.i] = r.stars; });
     $("buddyLabel").textContent = WORLD[w].pick;
     $("buddyPicker").innerHTML = BUDDIES[w].map((b, i) => {
       const locked = UNLOCK[i] > have;
       return `<button type="button" class="buddy-card${locked ? " locked" : ""}" data-i="${i}" aria-pressed="${cur.i === i}" ${locked ? 'aria-disabled="true"' : ""}
         aria-label="${b.name}${locked ? `, locked, needs ${UNLOCK[i]} stars` : ""}">
         <div class="buddy">${buddySvg(w, i)}</div><b>${locked ? "???" : b.name}</b>
-        ${locked ? `<small>🔒 ⭐ ${UNLOCK[i]}</small>` : ""}</button>`;
+        ${locked ? `<small>🔒 ⭐ ${UNLOCK[i]}</small>` : `<span class="pick-score">⭐ ${score[i]}</span>`}</button>`;
     }).join("");
     const next = UNLOCK.find((u) => u > have);
     $("buddyHint").textContent = next !== undefined
       ? `${settings.name.trim() || "You"} has ⭐ ${have}. Earn ${next - have} more star${next - have === 1 ? "" : "s"} to unlock a new friend!`
       : `All friends unlocked with ⭐ ${have} stars! 🎉`;
   }
+
+  const myTests = () => loadHist().filter((r) => (r.name || "").trim() === settings.name.trim());
+
+  function renderScoreboard() {
+    const w = world();
+    $("scoreboard").hidden = !w;
+    if (!w) return;
+    const rows = ranking(myTests(), w), have = starsEarned(settings.name), cur = currentBuddy();
+    const top = rows[0].stars > 0;
+    const who = settings.name.trim() || "Your";
+    $("sbTitle").textContent = w === "space" ? "🚀 Space Scoreboard" : "👑 Princess Scoreboard";
+    $("sbNote").textContent = `${who === "Your" ? "Your" : who + "'s"} stars for each ${w === "space" ? "friend" : "princess"}`;
+    $("sbGrid").innerHTML = rows.map((r, k) => {
+      const locked = UNLOCK[r.i] > have && !r.tests, me = cur && cur.i === r.i;
+      const medal = r.stars > 0 ? (["🥇", "🥈", "🥉"][k] || `#${k + 1}`) : "";
+      const info = r.tests ? `${r.tests} test${r.tests === 1 ? "" : "s"} · best ${r.best}%`
+        : locked ? `🔒 Unlocks at ⭐ ${UNLOCK[r.i]}` : "No tests yet";
+      return `<button type="button" class="sb-card${k === 0 && top ? " first" : ""}${me ? " me" : ""}${locked ? " locked" : ""}" data-i="${r.i}"
+          aria-label="${locked ? "Locked friend" : r.b.name}, ${r.stars} stars${medal ? ", place " + (k + 1) : ""}">
+        ${medal ? `<span class="sb-medal">${medal}</span>` : ""}${me ? `<span class="sb-now">Playing</span>` : ""}
+        <div class="buddy sb-av${k === 0 && top ? " dance" : ""}">${buddySvg(w, r.i)}</div>
+        <b class="sb-name">${locked ? "???" : r.b.name}</b>
+        <div class="sb-score">⭐ ${r.stars}</div>
+        <small>${info}</small>
+      </button>`;
+    }).join("");
+    if (cur) {
+      const pos = rows.findIndex((r) => r.i === cur.i), mine = rows[pos];
+      $("journeyScore").textContent = `${cur.b.name} ⭐ ${mine.stars}${mine.stars ? ` · #${pos + 1}` : ""}`;
+    }
+  }
+  $("sbGrid").addEventListener("click", (e) => {
+    const c = e.target.closest(".sb-card");
+    if (!c || c.classList.contains("locked") || phase === "running" || phase === "paused") return;
+    settings.buddy[settings.world] = +c.dataset.i; save(); renderWorld();
+    if (phase === "ready") resetToReady(false);
+    animateOnce(document.querySelector(`.sb-card[data-i="${c.dataset.i}"] .sb-av`), "spin");
+    beep(txt().chime, .07);
+  });
 
   function renderWorld() {
     const w = world();
@@ -1381,6 +1463,7 @@
     const n = settings.name.trim();
     $("title").textContent = w ? WORLD[w].title(n || "My") .replace(/^My's/, "My") : (n ? `${n}'s Math Sheet` : "My Math Sheet");
     renderBuddyPicker();
+    renderScoreboard();
     const cur = currentBuddy();
     $("journey").hidden = !cur;
     $("veilBuddy").hidden = !cur;
@@ -1505,6 +1588,7 @@
     const c = e.target.closest(".buddy-card"); if (!c) return;
     if (c.classList.contains("locked")) { $("buddyHint").animate?.([{ transform: "translateX(-4px)" }, { transform: "translateX(4px)" }, { transform: "none" }], 300); return; }
     settings.buddy[settings.world] = +c.dataset.i; save(); renderWorld();
+    if (phase === "ready") resetToReady(false);
     animateOnce(document.querySelector(`.buddy-card[data-i="${c.dataset.i}"] .buddy`), "spin");
     beep(WORLD[world()].chime, .07);
   });
@@ -1587,6 +1671,7 @@
     const h = loadHist(); h.push(rec);
     if (!saveHist(h)) $("rCheer").insertAdjacentHTML("beforeend", "<br><small class='note'>This browser blocked saving, so this test is not in your progress.</small>");
     if (!$("progressView").hidden) renderProgress();
+    renderScoreboard();
   }
 
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -1598,6 +1683,7 @@
   const pctClass = (p) => p >= 80 ? "hi" : p >= 50 ? "mid" : "lo";
 
   function renderProgress() {
+    renderScoreboard();
     const all = loadHist().slice().sort((a, b) => a.date.localeCompare(b.date));
     const names = [...new Set(all.map((r) => r.name || "—"))];
     const sel = $("pvName");
