@@ -356,6 +356,25 @@
     --goal-a: #ff9a5a; --goal-b: #ffd36e; --goal-roof: #7be3ff; --goal-door: #36d0ff;
     background-image: none;
   }
+
+  /* Each princess tints her kingdom. */
+  body[data-world="princess"][data-pal="sofia"] { --bg: #f6f0ff; --line: #e4d6fb; --accent: #9b4fd6; }
+  body[data-world="princess"][data-pal="elsa"] { --bg: #eef8ff; --line: #cbe6f7; --accent: #1f8fcf; }
+  body[data-world="princess"][data-pal="rapunzel"] { --bg: #fff6ea; --line: #f6dfc0; --accent: #b8600f; }
+  body[data-world="princess"][data-pal="snow"] { --bg: #fff4f2; --line: #f6d2cd; --accent: #d6303f; }
+  body[data-world="princess"][data-pal="cinderella"] { --bg: #eff6ff; --line: #d3e3fb; --accent: #3778d6; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) body[data-world="princess"][data-pal="sofia"] { --bg: #1f1530; --paper: #2d2045; --line: #47366a; --accent: #c79bff; }
+    :root:not([data-theme="light"]) body[data-world="princess"][data-pal="elsa"] { --bg: #0e1d33; --paper: #172b48; --line: #284466; --accent: #7fd3ff; }
+    :root:not([data-theme="light"]) body[data-world="princess"][data-pal="rapunzel"] { --bg: #241a12; --paper: #33261a; --line: #523d28; --accent: #ffb35c; }
+    :root:not([data-theme="light"]) body[data-world="princess"][data-pal="snow"] { --bg: #26141a; --paper: #361d25; --line: #55303b; --accent: #ff7080; }
+    :root:not([data-theme="light"]) body[data-world="princess"][data-pal="cinderella"] { --bg: #111c33; --paper: #1b2a4a; --line: #2c406a; --accent: #8db8ff; }
+  }
+  :root[data-theme="dark"] body[data-world="princess"][data-pal="sofia"] { --bg: #1f1530; --paper: #2d2045; --line: #47366a; --accent: #c79bff; }
+  :root[data-theme="dark"] body[data-world="princess"][data-pal="elsa"] { --bg: #0e1d33; --paper: #172b48; --line: #284466; --accent: #7fd3ff; }
+  :root[data-theme="dark"] body[data-world="princess"][data-pal="rapunzel"] { --bg: #241a12; --paper: #33261a; --line: #523d28; --accent: #ffb35c; }
+  :root[data-theme="dark"] body[data-world="princess"][data-pal="snow"] { --bg: #26141a; --paper: #361d25; --line: #55303b; --accent: #ff7080; }
+  :root[data-theme="dark"] body[data-world="princess"][data-pal="cinderella"] { --bg: #111c33; --paper: #1b2a4a; --line: #2c406a; --accent: #8db8ff; }
   #worldBg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
   /* Characters */
@@ -788,20 +807,20 @@
     $("bar").scrollIntoView({ behavior: "smooth", block: "start" });
     beep([523, 659], .08);
     lastMilestone = "";
-    if (world()) { say(pickRand(WORLD[world()].start)); animateOnce($("walker"), "hop"); }
+    if (world()) { say(pickRand(txt().start)); animateOnce($("walker"), "hop"); }
   }
   function pause() {
     if (phase === "running") {
       tick(); clearInterval(timerId); phase = "paused";
       setLocked(true, "Taking a break ☕", "The clock is stopped. Press Resume when you are ready.", "▶ Resume");
-      if (world()) say(WORLD[world()].pause);
+      if (world()) say(txt().pause);
     } else if (phase === "paused") resume();
     setButtons(); drawClock();
   }
   function resume() {
     phase = "running"; lastTick = performance.now(); timerId = setInterval(tick, 200);
     setLocked(false); setButtons(); drawClock();
-    if (world()) say(WORLD[world()].resume);
+    if (world()) say(txt().resume);
   }
 
   function resetToReady(newProblems) {
@@ -867,7 +886,7 @@
     const cur = currentBuddy();
     $("rBuddyRow").hidden = !cur; $("rJewels").hidden = !cur; $("rUnlock").hidden = true;
     if (cur) {
-      const W = WORLD[cur.w];
+      const W = txt();
       $("rBuddy").innerHTML = buddySvg(cur.w, cur.i);
       $("rSay").textContent = pct >= 80 ? W.gift(cur.b.name) : pct >= 50 ? W.ok(cur.b.name) : W.low(cur.b.name);
       $("rJewels").innerHTML = correct ? `${W.jewel.repeat(Math.min(correct, 20))}<br><small class="note">${W.jewelText(correct)}</small>` : "";
@@ -942,14 +961,24 @@
 
   // ---------- Worlds & buddies ----------
   // Original characters drawn as SVG. Stars earned on tests unlock more friends.
-  const UNLOCK = [0, 5, 15, 30, 50];
+  const UNLOCK = [0, 3, 6, 10, 15];
   const BUDDIES = {
     princess: [
-      { name: "Princess Noor",   skin: "#f3c9a5", hair: "#3b2416", dress: "#ff7eb6", trim: "#ffd1e6", hairStyle: "long",  item: "wand" },
-      { name: "Princess Roshni", skin: "#c98b5e", hair: "#1f1714", dress: "#9b7bff", trim: "#e2d9ff", hairStyle: "bun",   item: "flower" },
-      { name: "Princess Mira",   skin: "#f6d8c2", hair: "#e3a83f", dress: "#2fc4a6", trim: "#c8f3ea", hairStyle: "braid", item: "wand" },
-      { name: "Princess Tara",   skin: "#8d5a3b", hair: "#2a1a12", dress: "#ffad42", trim: "#ffe3b8", hairStyle: "puffs", item: "star" },
-      { name: "Princess Laila",  skin: "#e9b48e", hair: "#a8432a", dress: "#4f8dff", trim: "#d4e4ff", hairStyle: "long",  item: "flower" },
+      { key: "sofia", name: "Sofia", skin: "#f8d7c4", hair: "#7a3b1f", eye: "#4f86d9", lip: "#e2687f", dress: "#9a77e6", dressLight: "#d9c8ff",
+        goal: "castle", bg: "hearts", gift: "a magic amulet 💜", jewel: "💜", word: "amulet gems",
+        extra: ["Royal work!", "Magic math!", "Sofia is so proud!"] },
+      { key: "elsa", name: "Elsa", skin: "#fbe4d8", hair: "#f3e6c2", eye: "#3b74d8", lip: "#e47a95", dress: "#5cb8ec", dressLight: "#d6f1ff",
+        goal: "ice", bg: "snow", gift: "a sparkly snowflake crown ❄️", jewel: "❄️", word: "snowflakes",
+        extra: ["Snowflake power!", "Ice-cold clever!", "Frosty and fabulous!"] },
+      { key: "rapunzel", name: "Rapunzel", skin: "#f7d4bb", hair: "#f5c64b", eye: "#3a9a5b", lip: "#e9708a", dress: "#b48ef0", dressLight: "#e6d6ff",
+        goal: "tower", bg: "lanterns", gift: "a glowing golden lantern 🏮", jewel: "🌸", word: "flowers for her hair",
+        extra: ["The lanterns are glowing!", "Brilliant!", "Let your hair down, you're doing great!"] },
+      { key: "snow", name: "Snow White", skin: "#fde8e0", hair: "#1a1310", eye: "#6b3e26", lip: "#d62839", dress: "#f5c93a", dressLight: "#fff0a6",
+        goal: "cottage", bg: "apples", gift: "a shiny red apple 🍎", jewel: "🍎", word: "apples",
+        extra: ["Apple-solutely right!", "The seven friends cheer!", "Lovely!"] },
+      { key: "cinderella", name: "Cinderella", skin: "#f9dcc9", hair: "#f2d27a", eye: "#4a7fd4", lip: "#e47a95", dress: "#8cc4f2", dressLight: "#e8f5ff",
+        goal: "carriage", bg: "sparkles", gift: "a glass slipper 👠", jewel: "✨", word: "magic sparkles",
+        extra: ["Bibbidi-bobbidi-brilliant!", "Before midnight!", "Pure magic!"] },
     ],
     space: [
       { name: "Captain Rayan",  kind: "astro", skin: "#e9b48e", suit: "#ff8a3d" },
@@ -982,6 +1011,20 @@
     },
   };
   const world = () => WORLD[settings.world] ? settings.world : null;
+  // World text, with the chosen princess's own words and gifts mixed in.
+  function txt() {
+    const w = world(), cur = currentBuddy(), b = cur && cur.b, t = { ...WORLD[w] };
+    if (b && b.key) {
+      t.answer = [...WORLD[w].answer, ...b.extra, ...b.extra];
+      t.gift = (n) => `${n} gives you ${b.gift}!`;
+      t.jewel = b.jewel;
+      t.jewelText = (k) => `You collected ${k} ${b.word}!`;
+      const place = { castle: "the castle", ice: "the ice palace", tower: "the tower", cottage: "the cottage", carriage: "the carriage" }[b.goal];
+      t.half = `Halfway to ${place}!`; t.near = `${place[0].toUpperCase() + place.slice(1)} is so close!`;
+      t.start = [`Let's go to ${place}!`, "Ready, set, sparkle!"];
+    }
+    return t;
+  }
   const pickRand = (a) => a[Math.floor(Math.random() * a.length)];
 
   function faceSvg(cx, cy, skin) {
@@ -1000,31 +1043,134 @@
     return `<path d="M${x + 2} ${y - 26} l4 9 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z" fill="#ffd83f" stroke="#e0a800" stroke-width="1"></path>`;
   }
 
+  let svgUid = 0;
+  // A sparkle (four-point star) as an SVG path.
+  const twinkle = (x, y, r, fill) => `<path d="M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r} Z" fill="${fill}"></path>`;
+  const snowflake = (x, y, r, c) => `<g stroke="${c}" stroke-width="2" stroke-linecap="round">${[0, 60, 120].map((a) => {
+      const dx = r * Math.cos(a * Math.PI / 180), dy = r * Math.sin(a * Math.PI / 180);
+      return `<line x1="${x - dx}" y1="${y - dy}" x2="${x + dx}" y2="${y + dy}"></line>`; }).join("")}</g><circle cx="${x}" cy="${y}" r="2" fill="#fff"></circle>`;
+
+  function princessFace(cx, cy, b) {
+    const eye = (dx) => {
+      const x = cx + dx, s = Math.sign(dx);
+      return `<ellipse cx="${x}" cy="${cy + 1}" rx="3.6" ry="4.5" fill="#fff"></ellipse>
+        <circle cx="${x}" cy="${cy + 1.8}" r="3" fill="${b.eye}"></circle><circle cx="${x}" cy="${cy + 2}" r="1.6" fill="#1b1020"></circle>
+        <circle cx="${x + 1}" cy="${cy + .6}" r="1" fill="#fff"></circle>
+        <path d="M${x - 3.6} ${cy - 1.6} Q${x} ${cy - 5} ${x + 3.6} ${cy - 1.6}" stroke="#2a1a2e" stroke-width="1.6" fill="none" stroke-linecap="round"></path>
+        <path d="M${x + s * 3.2} ${cy - 2} l${s * 2.4} -1.8" stroke="#2a1a2e" stroke-width="1.4" stroke-linecap="round"></path>`;
+    };
+    return `<circle cx="${cx}" cy="${cy}" r="19" fill="${b.skin}"></circle>
+      <g class="eyes">${eye(-7.5)}${eye(7.5)}</g>
+      <circle cx="${cx - 12}" cy="${cy + 8}" r="3.6" fill="#ff8fb1" opacity=".45"></circle><circle cx="${cx + 12}" cy="${cy + 8}" r="3.6" fill="#ff8fb1" opacity=".45"></circle>
+      <circle cx="${cx}" cy="${cy + 6.5}" r="1" fill="#000" opacity=".15"></circle>
+      <path d="M${cx - 5} ${cy + 10} Q${cx} ${cy + 15.5} ${cx + 5} ${cy + 10} Q${cx} ${cy + 12} ${cx - 5} ${cy + 10} Z" fill="${b.lip}"></path>`;
+  }
+
+  // Each princess: hair behind the body, the gown, the hair in front, and what she holds.
+  const PRINCESS_ART = {
+    sofia: (b, u) => ({
+      back: `<path d="M38 48 Q30 70 35 92 Q40 99 47 94 Q60 100 73 94 Q80 99 85 92 Q90 70 82 48 Q80 26 60 26 Q40 26 38 48 Z" fill="${b.hair}"></path>`,
+      gown: `<path d="M60 94 C46 94 41 106 35 122 C30 136 24 146 20 151 Q60 161 100 151 C96 146 90 136 85 122 C79 106 74 94 60 94 Z" fill="url(#d${u})"></path>
+        <path d="M38 110 Q60 118 82 110 L88 128 Q60 138 32 128 Z" fill="#d9c6ff" opacity=".85"></path>
+        <path d="M30 128 Q60 138 90 128" stroke="#f4b8dc" stroke-width="3" fill="none"></path>
+        ${twinkle(46, 140, 3, "#fff")}${twinkle(74, 144, 3, "#fff")}${twinkle(60, 122, 2.5, "#fff")}
+        <path d="M47 80 Q60 75 73 80 L75 98 Q60 102 45 98 Z" fill="url(#d${u})"></path>
+        <path d="M45 94 Q60 100 75 94 L75 99 Q60 104 45 99 Z" fill="#f4b8dc"></path>`,
+      neck: `<path d="M52 72 Q60 84 68 72" stroke="#ffd36e" stroke-width="1.6" fill="none"></path><path d="M60 80 q-4 5 0 9 q4 -4 0 -9z" fill="#e0559b" stroke="#ffd36e" stroke-width="1"></path>`,
+      front: `<path d="M39 54 Q37 29 60 28 Q83 29 81 54 Q77 40 64 37 Q54 44 39 54 Z" fill="${b.hair}"></path>
+        <path d="M46 36 Q54 31 62 31" stroke="#fff" stroke-width="2" opacity=".3" fill="none" stroke-linecap="round"></path>
+        <path d="M49 32 L53 25 L56 29 L60 21 L64 29 L67 25 L71 32 Z" fill="#eef2fa" stroke="#aab4ca" stroke-width="1.2" stroke-linejoin="round"></path><circle cx="60" cy="28" r="2.2" fill="#e0559b"></circle>`,
+      item: itemSvg("wand", 88, 66),
+    }),
+    elsa: (b, u) => ({
+      back: `<path d="M46 78 Q28 118 22 157 Q60 150 98 158 Q92 118 74 78 Z" fill="#c9ecff" opacity=".85"></path><path d="M46 78 Q34 118 30 154 M74 78 Q86 118 90 154" stroke="#ffffff" stroke-width="1.5" opacity=".6" fill="none"></path>
+        ${twinkle(32, 140, 3, "#fff")}${twinkle(90, 132, 3, "#fff")}${twinkle(40, 110, 2.5, "#fff")}
+        <path d="M40 50 Q38 27 60 26 Q82 27 80 50 Q78 60 72 64 L48 64 Q42 60 40 50 Z" fill="${b.hair}"></path>`,
+      gown: `<path d="M60 94 C50 94 47 110 45 126 C43 140 40 148 37 152 Q60 158 83 152 C80 148 77 140 75 126 C73 110 70 94 60 94 Z" fill="url(#d${u})"></path>
+        ${twinkle(54, 120, 2.6, "#fff")}${twinkle(66, 134, 2.6, "#fff")}${twinkle(58, 146, 2.2, "#fff")}${twinkle(70, 112, 2, "#fff")}
+        <path d="M48 80 Q60 76 72 80 L73 98 Q60 101 47 98 Z" fill="url(#d${u})"></path>
+        <path d="M48 82 L72 82" stroke="#fff" stroke-width="1" opacity=".6" stroke-dasharray="2 3"></path>`,
+      neck: "",
+      front: `<path d="M40 52 Q38 28 62 28 Q82 30 80 50 Q72 36 56 37 Q46 40 40 52 Z" fill="${b.hair}"></path>
+        <path d="M44 38 Q58 26 74 34" stroke="#fff" stroke-width="2.2" opacity=".45" fill="none" stroke-linecap="round"></path>
+        ${[[76, 62], [78, 72], [80, 82], [81, 92], [81, 101]].map(([x, y], i) => `<ellipse cx="${x}" cy="${y}" rx="${6.5 - i * .5}" ry="5.5" fill="${b.hair}" stroke="#d8c690" stroke-width="1"></ellipse>`).join("")}
+        <path d="M78 106 Q81 112 84 108" stroke="${b.hair}" stroke-width="4" fill="none" stroke-linecap="round"></path>
+        ${snowflake(47, 36, 3.5, "#9fdcff")}`,
+      item: `<circle cx="92" cy="58" r="10" fill="#bfeaff" opacity=".35"></circle>${snowflake(92, 58, 8, "#6fc8f5")}${twinkle(102, 48, 3, "#bfeaff")}${twinkle(84, 46, 2.4, "#bfeaff")}`,
+    }),
+    rapunzel: (b, u) => ({
+      back: `<path d="M38 48 Q30 80 33 110 Q28 140 40 156 Q58 162 74 156 Q92 150 97 126 Q102 100 88 82 Q84 62 82 48 Q80 26 60 26 Q40 26 38 48 Z" fill="${b.hair}"></path>
+        <path d="M86 90 Q96 110 90 134" stroke="#d9a432" stroke-width="2" fill="none" opacity=".6"></path><path d="M36 100 Q32 124 40 148" stroke="#d9a432" stroke-width="2" fill="none" opacity=".6"></path>
+        ${[[37, 76, "#ff8fc1"], [34, 100, "#fff"], [37, 126, "#9fc8ff"], [88, 98, "#ff8fc1"], [92, 120, "#fff"], [50, 154, "#ff8fc1"], [80, 150, "#9fc8ff"]].map(([x, y, c]) =>
+          `<circle cx="${x}" cy="${y}" r="3.4" fill="${c}"></circle><circle cx="${x}" cy="${y}" r="1.3" fill="#ffd36e"></circle>`).join("")}`,
+      gown: `<path d="M60 94 C47 94 43 106 38 122 C34 136 29 145 26 150 Q60 158 94 150 C91 145 86 136 82 122 C77 106 73 94 60 94 Z" fill="url(#d${u})"></path>
+        <path d="M52 98 L48 148 M60 98 L60 152 M68 98 L72 148" stroke="#f4a6d0" stroke-width="2.5" opacity=".7"></path>
+        <path d="M47 80 Q60 75 73 80 L75 98 Q60 102 45 98 Z" fill="#7d4cc9"></path>
+        <path d="M54 82 L66 94 M66 82 L54 94" stroke="#f4a6d0" stroke-width="1.6"></path>
+        <ellipse cx="45" cy="83" rx="6" ry="5" fill="#f4a6d0"></ellipse><ellipse cx="75" cy="83" rx="6" ry="5" fill="#f4a6d0"></ellipse>`,
+      neck: "",
+      front: `<path d="M40 52 Q38 29 60 28 Q82 29 80 52 Q72 37 60 39 Q48 37 40 52 Z" fill="${b.hair}"></path>
+        <path d="M46 36 Q56 30 66 31" stroke="#fff" stroke-width="2" opacity=".4" fill="none" stroke-linecap="round"></path>
+        <circle cx="76" cy="38" r="3.2" fill="#ff8fc1"></circle><circle cx="80" cy="44" r="2.6" fill="#fff"></circle><circle cx="72" cy="34" r="2.4" fill="#9fc8ff"></circle>`,
+      item: `<circle cx="92" cy="56" r="13" fill="#ffb347" opacity=".25"></circle><line x1="90" y1="66" x2="92" y2="44" stroke="#8a5a2b" stroke-width="1.5"></line>
+        <rect x="85" y="47" width="14" height="17" rx="5" fill="#ffad3b"></rect><rect x="85" y="47" width="14" height="3" rx="1.5" fill="#c46a12"></rect>
+        <path d="M89 52 Q92 57 95 52" stroke="#fff3c4" stroke-width="1.6" fill="none"></path>`,
+    }),
+    snow: (b, u) => ({
+      back: `<path d="M38 52 Q34 27 60 26 Q86 27 82 52 Q85 66 76 70 Q79 58 74 46 L46 46 Q41 58 44 70 Q35 66 38 52 Z" fill="${b.hair}"></path>
+        <path d="M48 76 Q43 61 50 61 Q55 67 60 70 Q65 67 70 61 Q77 61 72 76 Z" fill="#fff" stroke="#e2e2ea" stroke-width="1"></path>`,
+      gown: `<path d="M60 94 C46 94 41 106 35 122 C30 136 24 146 20 151 Q60 161 100 151 C96 146 90 136 85 122 C79 106 74 94 60 94 Z" fill="url(#d${u})"></path>
+        <path d="M47 80 Q60 75 73 80 L75 98 Q60 102 45 98 Z" fill="#2b56c6"></path>
+        <path d="M60 78 L60 98" stroke="#1b3c95" stroke-width="1.5"></path>
+        <circle cx="43" cy="83" r="8" fill="#2b56c6"></circle><circle cx="77" cy="83" r="8" fill="#2b56c6"></circle>
+        <path d="M40 79 L41 88 M45 78 L46 88 M75 78 L74 88 M80 79 L79 88" stroke="#e23d4b" stroke-width="2"></path>
+        <path d="M24 148 Q60 158 96 148" stroke="#f0b93a" stroke-width="3" fill="none"></path>`,
+      neck: "",
+      front: `<path d="M40 49 Q42 29 60 29 Q78 29 80 49 Q74 37 63 38 Q56 44 48 40 Q43 44 40 49 Z" fill="${b.hair}"></path>
+        <path d="M46 34 Q54 30 62 30" stroke="#fff" stroke-width="2" opacity=".25" fill="none" stroke-linecap="round"></path>
+        <path d="M40 41 Q60 25 80 41" stroke="#e23d4b" stroke-width="3.2" fill="none" stroke-linecap="round"></path>
+        <path d="M62 28 L51 20 L51 34 Z M62 28 L73 20 L73 34 Z" fill="#e23d4b"></path><circle cx="62" cy="28" r="3" fill="#c42a38"></circle>`,
+      item: `<path d="M95 52 q4 -6 8 -4" stroke="#6b3e1f" stroke-width="1.8" fill="none"></path><path d="M96 51 q6 -6 10 -2 q-6 2 -10 2z" fill="#3aa35b"></path>
+        <circle cx="92" cy="60" r="8" fill="#e23d4b"></circle><circle cx="89" cy="57" r="2.2" fill="#fff" opacity=".7"></circle>`,
+    }),
+    cinderella: (b, u) => ({
+      back: `<circle cx="60" cy="27" r="12" fill="${b.hair}"></circle>
+        <path d="M40 52 Q38 28 60 28 Q82 28 80 52 Q78 60 74 62 L46 62 Q42 60 40 52 Z" fill="${b.hair}"></path>`,
+      gown: `<path d="M60 94 C40 94 30 110 20 130 C14 142 10 148 8 151 Q60 163 112 151 C110 148 106 142 100 130 C90 110 80 94 60 94 Z" fill="url(#d${u})"></path>
+        <path d="M30 118 Q44 128 60 120 Q76 128 90 118" stroke="#fff" stroke-width="2" opacity=".5" fill="none"></path>
+        ${twinkle(30, 140, 3, "#fff")}${twinkle(52, 134, 2.6, "#fff")}${twinkle(72, 144, 3, "#fff")}${twinkle(92, 136, 2.6, "#fff")}${twinkle(62, 112, 2.2, "#fff")}
+        <path d="M48 80 Q60 77 72 80 L74 98 Q60 102 46 98 Z" fill="url(#d${u})"></path>
+        <ellipse cx="43" cy="81" rx="9" ry="5.5" fill="#eaf5ff" opacity=".95"></ellipse><ellipse cx="77" cy="81" rx="9" ry="5.5" fill="#eaf5ff" opacity=".95"></ellipse>`,
+      neck: `<path d="M55 71 L65 71" stroke="#23305a" stroke-width="2.6" stroke-linecap="round"></path>`,
+      front: `<path d="M40 52 Q38 29 60 29 Q82 29 80 52 Q74 39 62 39 Q50 39 40 52 Z" fill="${b.hair}"></path>
+        <path d="M41 50 Q38 60 42 66" stroke="${b.hair}" stroke-width="3" fill="none" stroke-linecap="round"></path><path d="M79 50 Q82 60 78 66" stroke="${b.hair}" stroke-width="3" fill="none" stroke-linecap="round"></path>
+        <path d="M42 40 Q60 26 78 40" stroke="#23305a" stroke-width="3.4" fill="none" stroke-linecap="round"></path>
+        <path d="M48 34 Q56 30 64 31" stroke="#fff" stroke-width="2" opacity=".4" fill="none" stroke-linecap="round"></path>`,
+      item: `${twinkle(102, 48, 3.5, "#fff")}<path d="M84 64 Q92 64 98 58 Q101 56 102 60 Q102 66 96 68 L88 68 Q84 68 84 64 Z" fill="#dff4ff" stroke="#8fcaf0" stroke-width="1.4"></path>
+        <path d="M97 68 L98 74" stroke="#8fcaf0" stroke-width="2"></path>`,
+      glove: true,
+    }),
+  };
+
   function princessSvg(b) {
-    const back = {
-      long:  `<path d="M38 50 Q32 82 40 98 Q60 104 80 98 Q88 82 82 50 Q80 27 60 27 Q40 27 38 50 Z" fill="${b.hair}"></path>`,
-      braid: `<path d="M39 50 Q37 74 44 86 L76 86 Q83 74 81 50 Q80 27 60 27 Q40 27 39 50 Z" fill="${b.hair}"></path>
-              <circle cx="82" cy="70" r="6" fill="${b.hair}"></circle><circle cx="84" cy="81" r="5.5" fill="${b.hair}"></circle><circle cx="85" cy="91" r="5" fill="${b.hair}"></circle><circle cx="85" cy="99" r="3" fill="${b.trim}"></circle>`,
-      bun:   `<circle cx="60" cy="25" r="11" fill="${b.hair}"></circle><path d="M39 52 Q38 28 60 28 Q82 28 81 52 Q79 64 74 68 L46 68 Q41 64 39 52 Z" fill="${b.hair}"></path>`,
-      puffs: `<circle cx="36" cy="36" r="12" fill="${b.hair}"></circle><circle cx="84" cy="36" r="12" fill="${b.hair}"></circle><path d="M39 52 Q38 28 60 28 Q82 28 81 52 Q79 62 74 66 L46 66 Q41 62 39 52 Z" fill="${b.hair}"></path>`,
-    }[b.hairStyle];
-    return `<svg viewBox="0 0 120 160" aria-hidden="true"><g class="bob">
-      ${back}
-      <path d="M60 84 C45 84 41 96 35 116 C29 134 22 145 18 150 Q60 161 102 150 C98 145 91 134 85 116 C79 96 75 84 60 84 Z" fill="${b.dress}"></path>
-      <path d="M22 146 Q31 140 40 146 T58 146 T76 146 T94 146 T100 148" stroke="${b.trim}" stroke-width="4" fill="none" stroke-linecap="round"></path>
-      <circle cx="48" cy="124" r="2.5" fill="${b.trim}"></circle><circle cx="72" cy="130" r="2.5" fill="${b.trim}"></circle><circle cx="60" cy="114" r="2.5" fill="${b.trim}"></circle>
-      <path d="M47 81 Q60 76 73 81 L75 99 Q60 103 45 99 Z" fill="${b.dress}"></path>
-      <rect x="45" y="95" width="30" height="5" rx="2.5" fill="${b.trim}"></rect>
-      <rect x="56" y="68" width="8" height="12" fill="${b.skin}"></rect>
+    const u = ++svgUid, art = PRINCESS_ART[b.key](b, u);
+    const armColor = art.glove ? "#f5f8ff" : b.skin;
+    return `<svg viewBox="0 0 120 160" aria-hidden="true">
+      <defs><linearGradient id="d${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${b.dressLight}"></stop><stop offset="1" stop-color="${b.dress}"></stop></linearGradient></defs>
+      <g class="bob">
+      ${art.back}
+      ${art.gown}
+      <rect x="56" y="66" width="8" height="13" fill="${b.skin}"></rect>
+      ${art.neck}
       <path d="M48 85 Q40 96 38 108" stroke="${b.skin}" stroke-width="7" fill="none" stroke-linecap="round"></path>
+      ${art.glove ? `<path d="M43 97 Q40 102 38 108" stroke="${armColor}" stroke-width="7.5" fill="none" stroke-linecap="round"></path>` : ""}
       <g class="arm" style="transform-origin:72px 84px">
         <path d="M72 85 Q82 76 88 66" stroke="${b.skin}" stroke-width="7" fill="none" stroke-linecap="round"></path>
-        ${itemSvg(b.item, 88, 66, b.trim)}
+        ${art.glove ? `<path d="M81 75 Q85 70 88 66" stroke="${armColor}" stroke-width="7.5" fill="none" stroke-linecap="round"></path>` : ""}
+        ${art.item}
       </g>
-      ${faceSvg(60, 52, b.skin)}
-      <path d="M39 55 Q37 30 60 29 Q83 30 81 55 Q77 42 67 40 Q61 47 51 41 Q43 45 39 55 Z" fill="${b.hair}"></path>
-      <path d="M45 33 L47 20 L54 27 L60 15 L66 27 L73 20 L75 33 Z" fill="#ffcf3f" stroke="#e0a800" stroke-width="1.5" stroke-linejoin="round"></path>
-      <circle cx="60" cy="27" r="2.6" fill="${b.dress}"></circle><circle cx="50" cy="29" r="1.6" fill="#fff"></circle><circle cx="70" cy="29" r="1.6" fill="#fff"></circle>
+      ${princessFace(60, 50, b)}
+      ${art.front}
     </g></svg>`;
   }
   function astroSvg(b) {
@@ -1076,8 +1222,25 @@
     const b = BUDDIES[w][i];
     return w === "princess" ? princessSvg(b) : b.kind === "robot" ? robotSvg(b) : astroSvg(b);
   }
-  function goalSvg(w) {
-    if (w === "princess") return `<svg viewBox="0 0 60 64" aria-hidden="true">
+  function goalSvg(kind) {
+    if (kind === "ice") return `<svg viewBox="0 0 60 64" aria-hidden="true">
+      <path d="M6 62 L10 30 L14 62 Z M46 62 L50 26 L54 62 Z" fill="#bfe6ff"></path><path d="M14 62 L20 20 L26 62 Z M34 62 L40 18 L46 62 Z" fill="#9fd6fb"></path>
+      <path d="M22 62 L30 2 L38 62 Z" fill="#d9f2ff" stroke="#8fcaf0" stroke-width="1"></path><path d="M26 62 L26 52 Q30 46 34 52 L34 62 Z" fill="#6fc0ef"></path>
+      ${snowflake(30, 30, 4, "#fff")}</svg>`;
+    if (kind === "tower") return `<svg viewBox="0 0 60 64" aria-hidden="true">
+      <rect x="20" y="18" width="20" height="46" fill="#cdb8a0"></rect><path d="M20 28 h20 M20 40 h20 M20 52 h20" stroke="#ad977e" stroke-width="1.2"></path>
+      <path d="M14 20 L30 0 L46 20 Z" fill="#9b6bff"></path><path d="M25 34 Q30 26 35 34 L35 40 L25 40 Z" fill="#ffd36e"></path>
+      <path d="M33 38 Q46 46 40 64" stroke="#f5c64b" stroke-width="3" fill="none"></path><circle cx="50" cy="12" r="3.5" fill="#ffad3b" opacity=".85"></circle><circle cx="8" cy="22" r="3" fill="#ffad3b" opacity=".7"></circle></svg>`;
+    if (kind === "cottage") return `<svg viewBox="0 0 60 64" aria-hidden="true">
+      <rect x="10" y="30" width="40" height="32" fill="#f3d7a8"></rect><path d="M4 32 L30 10 L56 32 Z" fill="#a0522d"></path><rect x="40" y="12" width="7" height="14" fill="#8b5a3c"></rect>
+      <path d="M25 62 L25 46 Q30 40 35 46 L35 62 Z" fill="#7a4a2a"></path><rect x="14" y="38" width="8" height="8" fill="#9fd6fb"></rect><rect x="38" y="38" width="8" height="8" fill="#9fd6fb"></rect>
+      <circle cx="12" cy="60" r="3" fill="#e23d4b"></circle><circle cx="48" cy="60" r="3" fill="#ff8fc1"></circle></svg>`;
+    if (kind === "carriage") return `<svg viewBox="0 0 60 64" aria-hidden="true">
+      <ellipse cx="30" cy="34" rx="22" ry="18" fill="#ff9a3d"></ellipse><path d="M18 20 Q16 34 18 48 M30 16 L30 52 M42 20 Q44 34 42 48" stroke="#e07a1f" stroke-width="2" fill="none"></path>
+      <path d="M30 16 q-2 -8 4 -10" stroke="#3aa35b" stroke-width="2.5" fill="none"></path><rect x="24" y="28" width="12" height="12" rx="3" fill="#dff4ff"></rect>
+      <circle cx="14" cy="54" r="8" fill="none" stroke="#e9eef7" stroke-width="2.5"></circle><circle cx="46" cy="54" r="8" fill="none" stroke="#e9eef7" stroke-width="2.5"></circle>
+      ${twinkle(52, 12, 3, "#fff")}${twinkle(8, 18, 2.4, "#fff")}</svg>`;
+    if (kind === "castle") return `<svg viewBox="0 0 60 64" aria-hidden="true">
       <rect x="6" y="26" width="12" height="36" fill="var(--goal-a)"></rect><rect x="42" y="26" width="12" height="36" fill="var(--goal-a)"></rect>
       <rect x="16" y="34" width="28" height="28" fill="var(--goal-b)"></rect><rect x="24" y="18" width="12" height="44" fill="var(--goal-a)"></rect>
       <path d="M4 27 L12 10 L20 27 Z M40 27 L48 10 L56 27 Z" fill="var(--goal-roof)"></path><path d="M22 19 L30 0 L38 19 Z" fill="var(--goal-roof)"></path>
@@ -1130,6 +1293,8 @@
   function renderWorld() {
     const w = world();
     document.body.dataset.world = settings.world;
+    const cb = currentBuddy();
+    if (cb && cb.b.key) document.body.dataset.pal = cb.b.key; else delete document.body.dataset.pal;
     const n = settings.name.trim();
     $("title").textContent = w ? WORLD[w].title(n || "My") .replace(/^My's/, "My") : (n ? `${n}'s Math Sheet` : "My Math Sheet");
     renderBuddyPicker();
@@ -1139,7 +1304,7 @@
     if (cur) {
       $("walkerArt").innerHTML = buddySvg(cur.w, cur.i);
       $("veilBuddy").innerHTML = buddySvg(cur.w, cur.i);
-      $("goal").innerHTML = goalSvg(cur.w);
+      $("goal").innerHTML = goalSvg(cur.b.goal || "planet");
     }
     startBg();
   }
@@ -1162,10 +1327,10 @@
     const w = world(); if (!w || phase !== "running") return;
     const done = inputs().filter((x) => x.value.trim() !== "").length, total = problems.length;
     animateOnce($("walker"), "hop");
-    beep(WORLD[w].chime, .06);
-    let msg = pickRand(WORLD[w].answer);
+    const T = txt(); beep(T.chime, .06);
+    let msg = pickRand(T.answer);
     const m = done === total ? "all" : done / total >= .8 ? "near" : done / total >= .5 ? "half" : "";
-    if (m && m !== lastMilestone) { msg = WORLD[w][m]; lastMilestone = m; }
+    if (m && m !== lastMilestone) { msg = T[m]; lastMilestone = m; }
     say(msg);
   }
 
@@ -1180,8 +1345,12 @@
     ctx.clearRect(0, 0, cv.width, cv.height);
     if (!w) return;
     const W = () => cv.width, H = () => cv.height;
-    const pinks = ["#ff9ccf", "#ffd36e", "#c7a6ff", "#9fe3d3", "#ffb3c7"];
-    const parts = Array.from({ length: w === "space" ? 110 : 34 }, () => ({
+    const cb = currentBuddy(), kind = w === "space" ? "space" : (cb && cb.b.bg) || "hearts";
+    const pinks = {
+      hearts: ["#ff9ccf", "#ffd36e", "#c7a6ff", "#9fe3d3", "#ffb3c7"], snow: ["#ffffff", "#cfeeff", "#a8dcff"],
+      lanterns: ["#ffad3b", "#ffc85c", "#ff9a3d"], apples: ["#e23d4b", "#ff8fb1", "#ffffff"], sparkles: ["#ffffff", "#bfe0ff", "#ffe9a8"],
+    }[kind] || ["#ffffff"];
+    const parts = Array.from({ length: w === "space" ? 110 : kind === "snow" ? 60 : 34 }, () => ({
       x: Math.random(), y: Math.random(), s: w === "space" ? .6 + Math.random() * 1.6 : 5 + Math.random() * 9,
       v: .0004 + Math.random() * .0008, ph: Math.random() * 6.28, c: pickRand(pinks), heart: Math.random() < .5,
     }));
@@ -1205,10 +1374,25 @@
           ctx.fillStyle = "#ffffff";
           ctx.beginPath(); ctx.arc(p.x * W(), p.y * H(), p.s * dpr, 0, 6.28); ctx.fill();
         } else {
-          if (!still) { p.y -= p.v; if (p.y < -.05) { p.y = 1.05; p.x = Math.random(); } }
-          const x = (p.x + Math.sin(t / 1800 + p.ph) * .01) * W(), y = p.y * H();
-          ctx.globalAlpha = .4; ctx.fillStyle = p.c;
-          p.heart ? heart(x, y, p.s * dpr) : sparkle(x, y, p.s * dpr);
+          const falling = kind === "snow";
+          if (!still) {
+            p.y += falling ? p.v * 1.4 : -p.v;
+            if (p.y < -.05) { p.y = 1.05; p.x = Math.random(); }
+            if (p.y > 1.05) { p.y = -.05; p.x = Math.random(); }
+          }
+          const x = (p.x + Math.sin(t / 1800 + p.ph) * (falling ? .02 : .01)) * W(), y = p.y * H(), r = p.s * dpr;
+          ctx.fillStyle = p.c;
+          if (kind === "snow") {
+            ctx.globalAlpha = .75; ctx.beginPath(); ctx.arc(x, y, r * .35, 0, 6.28); ctx.fill();
+          } else if (kind === "lanterns") {
+            ctx.globalAlpha = .18; ctx.beginPath(); ctx.arc(x, y, r * 1.6, 0, 6.28); ctx.fill();
+            ctx.globalAlpha = .7; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - r * .5, y - r * .65, r, r * 1.3, r * .3) : ctx.rect(x - r * .5, y - r * .65, r, r * 1.3); ctx.fill();
+          } else if (kind === "sparkles") {
+            ctx.globalAlpha = .3 + .5 * (0.5 + 0.5 * Math.sin(t / 500 + p.ph)); sparkle(x, y, r * .8);
+          } else {
+            ctx.globalAlpha = .4;
+            p.heart ? heart(x, y, r) : sparkle(x, y, r);
+          }
         }
       });
       if (w === "space" && !still) {
